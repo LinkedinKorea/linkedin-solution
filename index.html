@@ -378,6 +378,7 @@
       <div class="card">
         <div class="hd"><b>요약</b><span class="muted">USD 기준</span></div>
         <div class="bd">
+
           <div class="kpis">
             <div class="kpi">
               <div class="t">총 합계</div>
@@ -426,6 +427,7 @@
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -623,8 +625,9 @@
       `;
 
       return `
-        <!-- ✅ 제목 크게 -->
-        <div style="font-size:28px;font-weight:900;letter-spacing:-.3px;line-height:1.1;">견적서 (LinkedIn Solutions)</div>
+        <div style="font-size:28px;font-weight:900;letter-spacing:-.3px;line-height:1.1;">
+          견적서 (LinkedIn Solutions)
+        </div>
 
         <div style="display:flex;justify-content:space-between;gap:12px;margin-top:12px;font-size:12px;color:#111827;">
           <div>
@@ -674,6 +677,17 @@
           </div>
         </div>
       `;
+    }
+
+    function pad2(n){ return String(n).padStart(2,'0'); }
+    function downloadStamp(){
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = pad2(d.getMonth()+1);
+      const day = pad2(d.getDate());
+      const hh = pad2(d.getHours());
+      const mm = pad2(d.getMinutes());
+      return `${y}${m}${day}_${hh}${mm}`;
     }
 
     async function makePdf(){
@@ -738,16 +752,20 @@
         }
       }
 
-      // ✅ PDF 맨 하단 가운데 고정 문구 (모든 페이지)
+      // ✅ PDF 하단 문구 크게 (모든 페이지)
       const footerText = "Linkedin Korea Partner_HR Point";
       const totalPages = doc.getNumberOfPages();
-      doc.setFontSize(9);
+      doc.setFontSize(14); // <-- 크게
+
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
-        doc.text(footerText, pageWidth / 2, pageHeight - 12, { align: 'center' });
+        doc.text(footerText, pageWidth / 2, pageHeight - 14, { align: 'center' });
       }
 
-      doc.save(`[Linkedin] 견적서_(Korea Partner_HR Point).pdf`);
+      // ✅ 파일명 뒤에 다운로드 날짜/시간 추가
+      const base = `[Linkedin] 견적서_(Korea Partner_HR Point)`;
+      const filename = `${base}_${downloadStamp()}.pdf`;
+      doc.save(filename);
     }
 
     const copyLink = async () => {

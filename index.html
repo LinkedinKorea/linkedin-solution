@@ -10,7 +10,7 @@
       --soft:#ffffff12;
 
       --disabledBg: rgba(255,255,255,.06);
-      --disabledText: rgba(229,231,235,.7);
+      --disabledText: rgba(229,231,235,.78);
       --disabledBorder: rgba(255,255,255,.10);
 
       --autoBg: rgba(96,165,250,.10);
@@ -40,14 +40,23 @@
     .bd{padding:16px}
 
     label{display:block;font-size:12px;color:#cbd5e1;margin-bottom:6px}
-    input, select{width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--line);background:#0b1220;color:var(--text);outline:none}
+    input, select{
+      width:100%;
+      padding:12px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#0b1220;
+      color:var(--text);
+      outline:none;
+    }
     input:focus, select:focus{border-color:rgba(96,165,250,.6);box-shadow:0 0 0 3px rgba(96,165,250,.14)}
     input[readonly]{opacity:.95}
 
     .rows{display:grid;gap:22px}
+
     .row{
       display:grid;
-      grid-template-columns: 1fr 200px 220px;
+      grid-template-columns: 1fr 240px 220px; /* ✅ Tier 글자 안 짤리도록 가운데 컬럼 확장 */
       gap:14px;
       align-items:center;
       padding:14px 0;
@@ -98,7 +107,7 @@
       .rowMeta2{grid-template-columns:1fr}
     }
 
-    /* ✅ 비활성(선택 불가) 표시 강화 */
+    /* ✅ 비활성 표시 */
     .readonlyDim{
       background: var(--disabledBg) !important;
       border-color: var(--disabledBorder) !important;
@@ -107,21 +116,21 @@
     }
     .labelDim{ color: rgba(203,213,225,.65) !important; }
 
-    /* ✅ 자동 계산/참고 영역 박스 */
-    .autoBox{
+    /* ✅ AI 참고 박스 */
+    .aiBox{
       border:1px solid var(--autoBorder);
       background:var(--autoBg);
       border-radius:16px;
       padding:12px 12px;
     }
-    .autoHead{
+    .aiHead{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
       margin-bottom:10px;
     }
-    .autoBadge{
+    .aiBadge{
       display:inline-flex;
       align-items:center;
       gap:8px;
@@ -131,26 +140,40 @@
       background:rgba(96,165,250,.10);
       color:var(--autoText);
       font-size:12px;
-      font-weight:800;
+      font-weight:900;
     }
-    .autoBadge .dot{
+    .aiBadge .dot{
       width:8px;height:8px;border-radius:999px;
       background:rgba(96,165,250,.95);
       box-shadow:0 0 0 3px rgba(96,165,250,.18);
     }
-    .autoNote{
-      color:rgba(219,234,254,.8);
+    .aiReq{
+      color:rgba(219,234,254,.85);
       font-size:12px;
-      line-height:1.5;
+      font-weight:800;
+      letter-spacing:-.1px;
     }
-    .autoGrid{
+    .aiGrid{
       display:grid;
       grid-template-columns: 1fr 220px 220px;
       gap:14px;
       align-items:end;
     }
     @media (max-width:720px){
-      .autoGrid{grid-template-columns:1fr}
+      .aiGrid{grid-template-columns:1fr}
+    }
+    .aiSmall{
+      font-size:11px;          /* ✅ 내용 더 작게 */
+      line-height:1.35;
+      white-space:pre-line;    /* ✅ 줄바꿈 유지 */
+    }
+
+    /* ✅ Tier 선택 박스: 텍스트 잘림 방지 */
+    #aiTier{
+      padding-right:34px;      /* 화살표 공간 확보 */
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      overflow:hidden;
     }
 
     table{width:100%;border-collapse:separate;border-spacing:0}
@@ -269,7 +292,6 @@
               <div>
                 <div class="solTitle">AI Hiring Assistant (Recruiter 옵션)</div>
                 <div class="descBox">JD 업로드 → 원하는 수 만큼 후보자 AI 평가 및 추천(채용담당자 검토시간 축소)</div>
-                <div class="hint">AI Hiring Assistant는 Recruiter 솔루션 + 옵션상품입니다.</div>
               </div>
               <div>
                 <label for="aiTier">Tier</label>
@@ -286,24 +308,24 @@
               </div>
             </div>
 
-            <!-- ✅ 자동 계산/참고 영역: 완전히 다른 박스 스타일 -->
-            <div class="autoBox">
-              <div class="autoHead">
-                <div class="autoBadge"><span class="dot"></span>자동 계산 영역</div>
-                <div class="autoNote">선택값에 따라 자동으로 표시됩니다 (선택 불가)</div>
+            <!-- ✅ AI 참고사항 박스 -->
+            <div class="aiBox">
+              <div class="aiHead">
+                <div class="aiBadge"><span class="dot"></span>AI Assistant 참고사항</div>
+                <div class="aiReq">Recruiter 계약필수</div>
               </div>
 
-              <div class="autoGrid">
-                <div class="muted">※ AI Assistant 금액은 선택한 Tier 단가로 계산됩니다(수량 없음).</div>
+              <div class="aiGrid">
+                <div class="muted">※ AI Hiring Assistant는 Recruiter 솔루션 옵션입니다.</div>
 
                 <div>
-                  <label class="labelDim">AI 평가/추천 가능 수</label>
-                  <input id="aiCapacity" class="readonlyDim" readonly />
+                  <label class="labelDim">검색된 후보자 AI 평가 및 추천</label>
+                  <input id="aiSearchCap" class="readonlyDim aiSmall" readonly />
                 </div>
 
                 <div>
-                  <label class="labelDim">참고</label>
-                  <input class="readonlyDim" value="Recruiter 계약 필수" readonly />
+                  <label class="labelDim">채용공고 지원자</label>
+                  <input id="aiApplicantCap" class="readonlyDim aiSmall" readonly />
                 </div>
               </div>
             </div>
@@ -311,7 +333,7 @@
             <div class="row">
               <div>
                 <div class="solTitle">Life Page (기업브랜딩/광고)</div>
-                <div class="descBox">기업 규모/목표/구성(탭 수 등)에 따라 가격이 상이합니다. 정확한 견적은 문의가 필요합니다.</div>
+                <div class="descBox">기업규모에 따른 가격 상이. 문의 필수</div>
               </div>
               <div>
                 <label for="lifeInclude">포함 여부</label>
@@ -474,10 +496,10 @@
       job: 2010,
       lti: 12500,
       ai: {
-        none: { price: 0, cap: 0, label: '선택 안 함' },
-        t1: { price: 3170, cap: 200, label: 'Tier 1 (200명)' },
-        t2: { price: 6910, cap: 800, label: 'Tier 2 (800명)' },
-        t3: { price: 10365, cap: 1500, label: 'Tier 3 (1,500명)' },
+        none: { price: 0, search: 0, app: 0, label: '선택 안 함' },
+        t1: { price: 3170, search: 200, app: 3500, label: 'Tier 1' },
+        t2: { price: 6910, search: 800, app: 9000, label: 'Tier 2' },
+        t3: { price: 10365, search: 1500, app: 25000, label: 'Tier 3' },
       }
     };
 
@@ -545,6 +567,23 @@
       return rows;
     };
 
+    function updateAiNotes(aiTier){
+      const sEl = document.getElementById('aiSearchCap');
+      const aEl = document.getElementById('aiApplicantCap');
+      const t = PRICES.ai[aiTier] || PRICES.ai.none;
+
+      if (!sEl || !aEl) return;
+
+      if (aiTier === 'none') {
+        sEl.value = '-';
+        aEl.value = '-';
+        return;
+      }
+
+      sEl.value = `검색 후보자 ${nfmt(t.search)}명\nAI 평가/추천`;
+      aEl.value = `채용공고 지원자 중\n${nfmt(t.app)}명 추천`;
+    }
+
     const recalc = () => {
       const aiTier = $('aiTier').value;
       const qtyRecruiter = toNum($('qtyRecruiter').value);
@@ -565,8 +604,7 @@
       $('amtLTI').value = money(amtLTI);
       $('amtLife').value = lifeInclude === 'yes' ? '문의 필수' : '-';
 
-      const cap = PRICES.ai[aiTier]?.cap || 0;
-      $('aiCapacity').value = aiTier === 'none' ? '후보자 직접 검증' : `후보자 ${nfmt(cap)}명 AI 평가/추천`;
+      updateAiNotes(aiTier);
 
       $('total').textContent = money(total);
       $('total2').textContent = money(total);
@@ -590,11 +628,11 @@
         return `<tr><td>${r.name}</td><td class="right">${unit}</td><td class="right">${qty}</td><td class="right">${amt}</td></tr>`;
       }).join('') : `<tr><td colspan="4" class="muted">선택된 항목이 없습니다. 수량/티어를 선택해 주세요.</td></tr>`;
 
-      return { total, rows };
+      return { total, rows, aiTier };
     };
 
     const makePdf = async () => {
-      const { total, rows } = recalc();
+      const { total, rows, aiTier } = recalc();
       if (!rows.length) { toast('수량/티어를 선택해 주세요.'); return; }
 
       const companyName = $('companyName').value?.trim() || '-';
@@ -652,13 +690,26 @@
         margin: { left: marginX, right: marginX },
       });
 
-      const endY = doc.lastAutoTable.finalY + 18;
+      let y2 = doc.lastAutoTable.finalY + 14;
+
+      // ✅ PDF에도 AI 참고사항(선택 시) 추가
+      if (aiTier !== 'none') {
+        const t = PRICES.ai[aiTier];
+        doc.setFontSize(10);
+        doc.text('AI Assistant 참고사항', marginX, y2);
+        y2 += 12;
+
+        doc.setFontSize(9);
+        doc.text(`- Recruiter 계약필수`, marginX, y2); y2 += 12;
+        doc.text(`- 검색 후보자 ${nfmt(t.search)}명 AI 평가/추천`, marginX, y2); y2 += 12;
+        doc.text(`- 채용공고 지원자 중 ${nfmt(t.app)}명 추천`, marginX, y2); y2 += 14;
+      }
+
       doc.setFontSize(12);
-      doc.text(`합계(USD): ${money(total)}`, 360, endY);
+      doc.text(`합계(USD): ${money(total)}`, 360, y2);
 
-      let y2 = endY + 18;
+      y2 += 18;
       doc.setFontSize(9);
-
       const lines = [
         '• 견적서 유효기간 내 Linkedin Korea Partner로 문의 부탁드립니다.',
         '• 전화 : 02-6405-4446 / E-mail : help@hrpoint.co.kr',

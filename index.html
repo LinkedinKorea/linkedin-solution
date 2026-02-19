@@ -260,6 +260,7 @@
       <div class="card">
         <div class="hd"><b>요약</b><span class="muted">USD 기준</span></div>
         <div class="bd">
+
           <div class="kpis">
             <div class="kpi">
               <div class="t">총 합계</div>
@@ -325,10 +326,12 @@
   <div id="pdfRender" style="position:fixed; left:-99999px; top:0; width:794px; background:#ffffff; color:#111827; padding:28px; font-family:'Noto Sans KR', Apple SD Gothic Neo, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;"></div>
 
   <script>
-    // ====== 설정 ======
-    const FOOTER_TEXT = "Linkedin Korea Partner_HR Point";
+    // ✅ 최종 WebApp URL (사용자 제공)
     const SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby_F8URpHtN14zowjDl0h4BGtQ47Q6ZIEkFCjDtEZrio8xS5jJcr50Ic8iylxx0Inojcg/exec";
-    const DEBUG_SHEET_LOG = true; // 저장 요청 URL을 콘솔에 찍습니다.
+
+    const $ = (id) => document.getElementById(id) || {
+      value: '', textContent: '', innerHTML: '', style: {}, addEventListener: () => {},
+    };
 
     const PRICES = {
       recruiter: 11350,
@@ -342,8 +345,6 @@
       }
     };
 
-    // ====== 헬퍼 ======
-    const $ = (id) => document.getElementById(id) || { value:'', textContent:'', innerHTML:'', style:{}, addEventListener:()=>{} };
     const nfmt = (n) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(n || 0));
     const money = (n) => `$${nfmt(n)}`;
     const toNum = (v) => {
@@ -353,6 +354,7 @@
       const x = Number(s);
       return isFinite(x) ? x : 0;
     };
+
     const toast = (msg='완료') => {
       const t = $('toast');
       t.textContent = msg;
@@ -371,16 +373,23 @@
       const rnd = Math.random().toString(16).slice(2,6).toUpperCase();
       return `${yyyymmdd()}-LK-${rnd}`;
     };
+
     function ensureQuoteNoOnce() {
       const KEY = "lk_quote_no_v1";
       const fromUrl = new URLSearchParams(location.search).get("quoteNo");
       const saved = sessionStorage.getItem(KEY);
-      const quoteNo = (fromUrl && fromUrl.trim()) ? fromUrl.trim() : (saved && saved.trim()) ? saved.trim() : genQuoteNo();
+
+      const quoteNo =
+        (fromUrl && fromUrl.trim()) ? fromUrl.trim() :
+        (saved && saved.trim()) ? saved.trim() :
+        genQuoteNo();
+
       sessionStorage.setItem(KEY, quoteNo);
       const el = document.getElementById("quoteNoInput");
       if (el) el.value = quoteNo;
       return quoteNo;
     }
+
     const addDaysISO = (isoDate, days) => {
       if (!isoDate) return '';
       const d = new Date(isoDate + 'T00:00:00');
@@ -388,19 +397,7 @@
       return d.toISOString().slice(0,10);
     };
 
-    function pad2(n){ return String(n).padStart(2,'0'); }
-    function downloadStamp(){
-      const d = new Date();
-      return `${d.getFullYear()}${pad2(d.getMonth()+1)}${pad2(d.getDate())}_${pad2(d.getHours())}${pad2(d.getMinutes())}`;
-    }
-
-    function escapeHtml(s){
-      return String(s ?? '')
-        .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
-        .replaceAll('"','&quot;').replaceAll("'","&#039;");
-    }
-
-    function buildRows(state){
+    const buildRows = (state) => {
       const rows = [];
       if (state.qtyRecruiter > 0) rows.push({ key:'Recruiter', name:'Recruiter (인재검색)', unit:PRICES.recruiter, qty:state.qtyRecruiter, amount:state.amtRecruiter });
       if (state.qtyJob > 0) rows.push({ key:'Job Slot', name:'Job Slot (채용공고)', unit:PRICES.job, qty:state.qtyJob, amount:state.amtJob });
@@ -408,27 +405,26 @@
       if (state.lifeInclude === 'yes') rows.push({ key:'Life Page', name:'Life Page (기업브랜딩/광고) — 문의 필수', unit:null, qty:null, amount:null });
       if (state.qtyLTI > 0) rows.push({ key:'LTI', name:'LTI (경쟁사 분석)', unit:PRICES.lti, qty:state.qtyLTI, amount:state.amtLTI });
       return rows;
-    }
-
-    function selectionSummary(rows){
-      return rows.map(r => {
-        if (r.key === 'AI Hiring Assistant') return `AI(${r.tier || ''}) x1`;
-        if (r.qty == null) return `${r.key}`;
-        return `${r.key} x${r.qty}`;
-      }).join('; ');
-    }
+    };
 
     function updateAiNotes(aiTier){
       const sEl = document.getElementById('aiSearchCap');
       const aEl = document.getElementById('aiApplicantCap');
       const t = PRICES.ai[aiTier] || PRICES.ai.none;
+
       if (!sEl || !aEl) return;
-      if (aiTier === 'none') { sEl.value = '-'; aEl.value = '-'; return; }
+
+      if (aiTier === 'none') {
+        sEl.value = '-';
+        aEl.value = '-';
+        return;
+      }
+
       sEl.value = `13억 가입자 중\nAI검색 및 추천 ${nfmt(t.search)}명`;
       aEl.value = `채용공고 지원자 중\n${nfmt(t.app)}명 추천`;
     }
 
-    function recalc(){
+    const recalc = () => {
       const aiTier = $('aiTier').value;
       const qtyRecruiter = toNum($('qtyRecruiter').value);
       const qtyJob = toNum($('qtyJob').value);
@@ -454,6 +450,7 @@
       $('total2').textContent = money(total);
 
       const rows = buildRows({ aiTier, qtyRecruiter, qtyJob, qtyLTI, lifeInclude, amtRecruiter, amtAI, amtJob, amtLTI, total });
+
       $('items').textContent = rows.length ? `${rows.length}개 항목` : '-';
 
       const tb = $('tbody');
@@ -465,6 +462,15 @@
       }).join('') : `<tr><td colspan="4" class="muted">선택된 항목이 없습니다. 수량/티어를 선택해 주세요.</td></tr>`;
 
       return { total, rows, aiTier };
+    };
+
+    function escapeHtml(s){
+      return String(s ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
     }
 
     function buildPdfHtml({ quoteNo, quoteDate, validUntil, companyName, contactName, contactEmail, rows, total, aiTier }){
@@ -527,7 +533,9 @@
                 <th style="padding:10px 8px;text-align:right;">금액(USD)</th>
               </tr>
             </thead>
-            <tbody>${rowsHtml}</tbody>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
             <tfoot>
               <tr>
                 <td colspan="3" style="padding:10px 8px;text-align:right;font-weight:900;border-top:1px solid #e5e7eb;">합계</td>
@@ -550,43 +558,50 @@
       `;
     }
 
-    // ✅ 시트 저장: sendBeacon(가능하면) → 이미지 비콘 fallback
-    async function saveToSheet(payload){
-      const params = new URLSearchParams();
-      params.set('savedAt', payload.savedAt || new Date().toISOString());
-      params.set('quoteNo', payload.quoteNo || '');
-      params.set('companyName', payload.companyName || '');
-      params.set('contactName', payload.contactName || '');
-      params.set('contactEmail', payload.contactEmail || '');
-      params.set('currency', payload.currency || 'USD');
-      params.set('totalUSD', String(payload.totalUSD ?? ''));
-      params.set('selectedCount', String(payload.selectedCount ?? ''));
-      params.set('selectedSummary', payload.selectedSummary || '');
-      params.set('aiTier', payload.aiTier || '');
-      params.set('userAgent', navigator.userAgent || '');
-      params.set('pageUrl', location.href || '');
-      params.set('_ts', String(Date.now())); // cache buster
+    function pad2(n){ return String(n).padStart(2,'0'); }
+    function downloadStamp(){
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = pad2(d.getMonth()+1);
+      const day = pad2(d.getDate());
+      const hh = pad2(d.getHours());
+      const mm = pad2(d.getMinutes());
+      return `${y}${m}${day}_${hh}${mm}`;
+    }
 
-      const url = `${SHEET_WEBAPP_URL}?${params.toString()}`;
+    function selectionSummary(rows){
+      return rows.map(r => {
+        if (r.key === 'AI Hiring Assistant') return `AI(${r.tier || ''}) x1`;
+        if (r.qty == null) return `${r.key}`;
+        return `${r.key} x${r.qty}`;
+      }).join('; ');
+    }
 
-      if (DEBUG_SHEET_LOG) console.log('[SHEET] sending:', url);
-
-      // 1) sendBeacon 시도 (응답은 못 받지만 전송 성공률 높음)
-      try{
-        if (navigator.sendBeacon) {
-          const ok = navigator.sendBeacon(url, new Blob([], {type:'text/plain'}));
-          if (DEBUG_SHEET_LOG) console.log('[SHEET] sendBeacon result:', ok);
-          // sendBeacon이 false여도 fallback 진행
-          if (ok) return true;
-        }
-      }catch(e){}
-
-      // 2) 이미지 비콘 fallback
+    // ✅ CORS 우회: "비콘 이미지" 방식 (GAS doGet이 파라미터 받으면 저장됨)
+    function saveToGoogleSheetBeacon(payload){
       return new Promise((resolve) => {
+        const params = new URLSearchParams();
+        params.set('savedAt', payload.savedAt || new Date().toISOString());
+        params.set('quoteNo', payload.quoteNo || '');
+        params.set('companyName', payload.companyName || '');
+        params.set('contactName', payload.contactName || '');
+        params.set('contactEmail', payload.contactEmail || '');
+        params.set('currency', payload.currency || 'USD');
+        params.set('totalUSD', String(payload.totalUSD ?? ''));
+        params.set('selectedCount', String(payload.selectedCount ?? ''));
+        params.set('selectedSummary', payload.selectedSummary || '');
+        params.set('aiTier', payload.aiTier || '');
+        params.set('userAgent', navigator.userAgent || '');
+        params.set('pageUrl', location.href || '');
+        params.set('_ts', String(Date.now())); // cache buster
+
+        const url = `${SHEET_WEBAPP_URL}?${params.toString()}`;
+
         const img = new Image();
         img.onload = () => resolve(true);
-        img.onerror = () => resolve(true); // GAS는 JSON 반환이라 error여도 요청은 나감
+        img.onerror = () => resolve(true); // GAS는 JSON 반환이라 error일 수 있어도 요청은 나감
         img.src = url;
+
         setTimeout(() => resolve(true), 2000);
       });
     }
@@ -603,18 +618,22 @@
       const contactName  = $('contactName').value?.trim() || '-';
       const contactEmail = $('contactEmail').value?.trim() || '-';
 
-      // 1) 시트 저장(먼저)
-      await saveToSheet({
+      // ✅ 1) 시트 저장 (비콘)
+      const payload = {
         savedAt: new Date().toISOString(),
-        quoteNo, companyName, contactName, contactEmail,
-        currency: 'USD',
+        quoteNo,
+        companyName,
+        contactName,
+        contactEmail,
+        currency: "USD",
         totalUSD: Math.round(total || 0),
         selectedCount: rows.length,
         selectedSummary: selectionSummary(rows),
         aiTier
-      });
+      };
+      await saveToGoogleSheetBeacon(payload);
 
-      // 2) PDF 생성(캡처)
+      // ✅ 2) PDF 생성(캡처)
       const pdfEl = document.getElementById('pdfRender');
       pdfEl.innerHTML = buildPdfHtml({ quoteNo, quoteDate, validUntil, companyName, contactName, contactEmail, rows, total, aiTier });
 
@@ -660,21 +679,22 @@
         }
       }
 
-      // 3) 하단 문구 크게 (Arial 요청: jsPDF 기본폰트 helvetica 사용)
+      // ✅ PDF 하단 문구 크게 (Arial 요청: 기본폰트중 helvetica 사용)
+      const footerText = "Linkedin Korea Partner_HR Point";
       const totalPages = doc.getNumberOfPages();
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(16);
 
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
-        doc.text(FOOTER_TEXT, pageWidth / 2, pageHeight - 14, { align: 'center' });
+        doc.text(footerText, pageWidth / 2, pageHeight - 14, { align: 'center' });
       }
 
       const base = `[Linkedin] 견적서_(Korea Partner_HR Point)`;
       doc.save(`${base}_${downloadStamp()}.pdf`);
     }
 
-    async function copyLink(){
+    const copyLink = async () => {
       const p = new URLSearchParams({
         qtyRecruiter: $('qtyRecruiter').value || '0',
         aiTier: $('aiTier').value || 'none',
@@ -700,23 +720,26 @@
         document.body.removeChild(ta);
         toast('입력값 링크가 복사되었습니다.');
       }
-    }
+    };
 
-    function resetAll(){
+    const resetAll = () => {
       sessionStorage.removeItem("lk_quote_no_v1");
+
       $('companyName').value='';
       $('contactName').value='';
       $('contactEmail').value='';
+
       $('qtyRecruiter').value='0';
       $('aiTier').value='none';
       $('qtyJob').value='0';
       $('lifeInclude').value='no';
       $('qtyLTI').value='0';
+
       history.replaceState({}, '', location.pathname);
       ensureQuoteNoOnce();
       recalc();
       toast('초기화 완료');
-    }
+    };
 
     document.getElementById('btnPdf')?.addEventListener('click', async (e)=>{e.preventDefault(); await makePdf();});
     document.getElementById('btnCopyLink')?.addEventListener('click', (e)=>{e.preventDefault(); copyLink();});
@@ -748,19 +771,8 @@
   </script>
 
   <!--
-    ✅ 매우 중요: Apps Script(WebApp) 코드가 doGet(e)로 파라미터를 받아 appendRow 해야 저장됩니다.
-    예시(Code.gs):
-
-    const SHEET_NAME='Leads';
-    function doGet(e){
-      const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME) || SpreadsheetApp.getActiveSpreadsheet().insertSheet(SHEET_NAME);
-      if(sh.getLastRow()===0) sh.appendRow(['savedAt','quoteNo','companyName','contactName','contactEmail','currency','totalUSD','selectedCount','selectedSummary','aiTier','userAgent','pageUrl']);
-      const p=e.parameter||{};
-      sh.appendRow([p.savedAt||new Date().toISOString(),p.quoteNo||'',p.companyName||'',p.contactName||'',p.contactEmail||'',p.currency||'USD',p.totalUSD||'',p.selectedCount||'',p.selectedSummary||'',p.aiTier||'',p.userAgent||'',p.pageUrl||'']);
-      return ContentService.createTextOutput('ok');
-    }
-
-    그리고 웹앱 배포에서 "모든 사용자(Anyone)"로 접근 허용해야 합니다.
+    ✅ 반드시 Apps Script(WebApp) 쪽은 doGet(e)로 파라미터를 받아 시트에 appendRow 해야 합니다.
+    (비콘 방식은 CORS/응답 읽기와 무관하게 요청을 보내기 위해 사용합니다.)
   -->
 </body>
 </html>

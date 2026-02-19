@@ -5,36 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LinkedIn 기업용 솔루션 자동 견적서</title>
   <style>
-    :root{--bg:#0b0f14;--card:#111827;--muted:#9ca3af;--text:#e5e7eb;--accent:#60a5fa;--line:#1f2937}
+    :root{
+      --bg:#0b0f14;--card:#111827;--muted:#9ca3af;--text:#e5e7eb;--accent:#60a5fa;--line:#1f2937;
+      --soft:#ffffff12; /* 약한 흰색 배경 */
+    }
     *{box-sizing:border-box}
-    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,Helvetica,Arial; background:linear-gradient(180deg,#070a0f,#0b0f14 40%); color:var(--text)}
+    body{
+      margin:0;
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,Helvetica,Arial;
+      background:linear-gradient(180deg,#070a0f,#0b0f14 40%);
+      color:var(--text)
+    }
     a{color:var(--accent);text-decoration:none}
     a:hover{text-decoration:underline}
 
-    .wrap{max-width:1120px;margin:0 auto;padding:26px 16px 110px}
+    /* ✅ 전체 폭/여백을 조금 더 넓게 */
+    .wrap{max-width:1240px;margin:0 auto;padding:28px 18px 120px}
     .top{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap}
     h1{margin:0;font-size:22px;letter-spacing:-.2px}
     .sub{margin:8px 0 0;color:var(--muted);line-height:1.55;font-size:13px}
     .pill{display:inline-flex;gap:8px;align-items:center;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.25);color:#cfe6ff;padding:8px 10px;border-radius:999px;font-size:12px}
 
-    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin-top:14px}
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-top:16px}
     @media (max-width:980px){.grid{grid-template-columns:1fr}}
 
     .card{background:rgba(17,24,39,.72);border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 30px rgba(0,0,0,.25);overflow:hidden}
     .hd{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}
     .hd b{font-size:14px}
-    .bd{padding:14px 16px}
+    .bd{padding:16px}
 
     label{display:block;font-size:12px;color:#cbd5e1;margin-bottom:6px}
     input, select{width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--line);background:#0b1220;color:var(--text);outline:none}
     input:focus, select:focus{border-color:rgba(96,165,250,.6);box-shadow:0 0 0 3px rgba(96,165,250,.14)}
     input[readonly]{opacity:.9}
 
-    .rows{display:grid;gap:16px}
-    .row{display:grid;grid-template-columns:1fr 160px 160px;gap:12px;align-items:end;padding:6px 0}
+    /* ✅ 행 간격(상하 간격) 통일 + 깔끔 정렬 */
+    .rows{display:grid;gap:14px}
+    .row{display:grid;grid-template-columns:1fr 170px 180px;gap:12px;align-items:end;padding:10px 0}
     @media (max-width:720px){.row{grid-template-columns:1fr}}
 
-    .hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.35;min-height:32px}
+    .hint{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.35;min-height:0}
 
     table{width:100%;border-collapse:separate;border-spacing:0}
     th, td{padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:top}
@@ -51,7 +61,7 @@
     .callout{margin-top:12px;padding:10px 12px;border-radius:14px;border:1px solid rgba(96,165,250,.25);background:rgba(96,165,250,.08);color:#dbeafe;font-size:12px;line-height:1.55}
 
     .sticky{position:fixed;left:0;right:0;bottom:0;padding:14px 14px;background:rgba(8,12,18,.72);backdrop-filter:blur(10px);border-top:1px solid var(--line)}
-    .sticky .inner{max-width:1120px;margin:0 auto;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .sticky .inner{max-width:1240px;margin:0 auto;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
     .btns{display:flex;gap:10px;flex-wrap:wrap}
     button{appearance:none;border:1px solid var(--line);background:#0b1220;color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:800;font-size:13px}
     button.primary{border-color:rgba(96,165,250,.45);background:rgba(96,165,250,.14)}
@@ -60,9 +70,21 @@
     .toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:rgba(17,24,39,.92);border:1px solid var(--line);padding:10px 12px;border-radius:12px;box-shadow:0 12px 24px rgba(0,0,0,.35);font-size:13px;display:none;z-index:9999}
 
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+
+    /* ✅ 설명 영역: 약한 흰색 배경 박스로 구분 */
+    .descBox{
+      margin-top:8px;
+      background:var(--soft);
+      border:1px solid rgba(255,255,255,.08);
+      padding:10px 10px;
+      border-radius:12px;
+      color:#cbd5e1;
+      font-size:12px;
+      line-height:1.55;
+    }
   </style>
 
-  <!-- PDF 생성용 라이브러리 (클라이언트에서만 사용) -->
+  <!-- PDF 생성용 라이브러리 -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.31/dist/jspdf.plugin.autotable.min.js" crossorigin="anonymous"></script>
 </head>
@@ -81,14 +103,47 @@
 
     <div class="grid">
       <div class="card">
-        <div class="hd"><b>고객/견적 정보</b><span class="muted">PDF에 함께 출력됩니다</span></div>
+        <!-- ✅ 제목 변경 -->
+        <div class="hd"><b>기업 솔루션 선택</b><span class="muted">PDF에 함께 출력됩니다</span></div>
         <div class="bd">
           <div class="rows">
+
+            <!-- ✅ 회사/담당자/이메일/견적번호 입력 -->
+            <div class="row">
+              <div>
+                <label for="companyName">회사명</label>
+                <input id="companyName" placeholder="예) HR Point" />
+              </div>
+              <div>
+                <label for="contactName">담당자</label>
+                <input id="contactName" placeholder="예) 홍길동" />
+              </div>
+              <div>
+                <label for="contactEmail">이메일</label>
+                <input id="contactEmail" placeholder="예) name@company.com" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label for="quoteNoInput">견적번호</label>
+                <input id="quoteNoInput" class="mono" placeholder="자동 생성 또는 직접 입력" />
+                <div class="hint">비워두면 PDF 다운로드 시 자동 생성됩니다.</div>
+              </div>
+              <div>
+                <label>유효기간(일)</label>
+                <input id="validDays" value="20" readonly />
+              </div>
+              <div>
+                <label>통화</label>
+                <input value="USD (VAT 없음)" readonly />
+              </div>
+            </div>
 
             <div class="row">
               <div>
                 <label>Recruiter (인재검색) — $11,350 / 라이선스</label>
-                <div class="muted">13억명의 가입자를 언제든 검색하고, 인맥과 관련없이 메시지를 보낼 수 있습니다.</div>
+                <div class="descBox">13억명의 가입자를 언제든 검색하고, 인맥과 관련없이 메시지를 보낼 수 있습니다.</div>
               </div>
               <div>
                 <label for="qtyRecruiter">수량(라이선스)</label>
@@ -107,7 +162,7 @@
             <div class="row">
               <div>
                 <label>Job Slot (채용공고) — $2,010 / 슬롯</label>
-                <div class="muted">직무별 채용공고를 오픈하고, 후보자를 지속적으로 모집합니다.</div>
+                <div class="descBox">직무별 채용공고를 오픈하고, 후보자를 지속적으로 모집합니다.</div>
               </div>
               <div>
                 <label for="qtyJob">수량(슬롯)</label>
@@ -123,10 +178,10 @@
               </div>
             </div>
 
-            <div class="row" style="grid-template-columns:1fr 160px 160px">
+            <div class="row">
               <div>
                 <label>AI Hiring Assistant (Recruiter 옵션) — Tier 선택</label>
-                <div class="muted">JD 업로드 → 원하는 수 만큼 후보자 AI 평가 및 추천(채용담당자 검토시간 축소)</div>
+                <div class="descBox">JD 업로드 → 원하는 수 만큼 후보자 AI 평가 및 추천(채용담당자 검토시간 축소)</div>
                 <div class="hint">AI Hiring Assistant는 Recruiter 솔루션 + 옵션상품입니다.</div>
               </div>
               <div>
@@ -144,8 +199,8 @@
               </div>
             </div>
 
-            <div class="row" style="grid-template-columns:1fr 160px 160px">
-              <div class="muted" style="margin-top:-6px">※ AI Assistant 금액은 선택한 Tier 단가로 계산됩니다(수량 없음).</div>
+            <div class="row">
+              <div class="muted" style="margin-top:-4px">※ AI Assistant 금액은 선택한 Tier 단가로 계산됩니다(수량 없음).</div>
               <div>
                 <label>AI 평가/추천 가능 수</label>
                 <input id="aiCapacity" readonly />
@@ -159,7 +214,7 @@
             <div class="row">
               <div>
                 <label>Life Page (기업브랜딩/광고) — 문의 필수</label>
-                <div class="muted">기업 규모/목표/구성(탭 수 등)에 따라 가격이 상이합니다. 정확한 견적은 문의가 필요합니다.</div>
+                <div class="descBox">기업 규모/목표/구성(탭 수 등)에 따라 가격이 상이합니다. 정확한 견적은 문의가 필요합니다.</div>
               </div>
               <div>
                 <label for="lifeInclude">포함 여부</label>
@@ -177,7 +232,7 @@
             <div class="row">
               <div>
                 <label>LTI (경쟁사 분석) — $12,500 / 라이선스</label>
-                <div class="muted">경쟁사의 인력현황 및 역량 분석을 통해 지금 우리에게 필요한 것이 무엇인지 전략을 세울 수 있습니다.</div>
+                <div class="descBox">경쟁사의 인력현황 및 역량 분석을 통해 지금 우리에게 필요한 것이 무엇인지 전략을 세울 수 있습니다.</div>
               </div>
               <div>
                 <label for="qtyLTI">수량(라이선스)</label>
@@ -194,9 +249,11 @@
             </div>
           </div>
 
+          <!-- ✅ 문의 안내 문구/연락처 변경 -->
           <div class="callout">
             <b>문의 안내</b><br/>
-            • 견적서 유효기간 내 <b>02-6405-4446</b>으로 문의 부탁드립니다.<br/>
+            • 견적서 유효기간 내 <b>Linkedin Korea Partner</b>로 문의 부탁드립니다.<br/>
+            • 전화 : <b>02-6405-4446</b> / E-mail : <b>help@hrpoint.co.kr</b><br/>
             • Life Page는 기업 규모에 따라 금액이 상이. <b>문의필수</b>
           </div>
         </div>
@@ -246,8 +303,8 @@
             <div class="callout" style="margin-top:0;border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.10);color:#d1fae5">
               <b>기업용 솔루션 문의</b><br/>
               LinkedIn Korea Partner<br/>
-              02-6405-4446<br/>
-              help@hrpoint.co.kr
+              전화 : 02-6405-4446<br/>
+              E-mail : help@hrpoint.co.kr
             </div>
           </div>
         </div>
@@ -269,7 +326,6 @@
   </div>
 
   <script>
-    // 안전 DOM 헬퍼: 요소가 없으면 더미 객체를 반환해 스크립트가 중단되지 않게 합니다.
     const $ = (id) => document.getElementById(id) || {
       value: '',
       textContent: '',
@@ -279,8 +335,10 @@
     };
 
     // ===== PDF 한글 폰트 로딩 (jsPDF 기본 폰트는 한글을 지원하지 않아 깨집니다) =====
+    // ✅ 안정적인 TTF 파일로 로딩 (CORS 허용되는 CDN)
     const KOREAN_FONT_URL =
-      "https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-kr/files/noto-sans-kr-korean-400-normal.ttf";
+      "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/notosanskr/NotoSansKR-Regular.ttf";
+
     let __koreanFontB64 = null;
     let __koreanFontLoading = null;
 
@@ -295,7 +353,6 @@
     }
 
     async function ensureKoreanFont(doc) {
-      // 이미 폰트가 있으면 스킵
       try { doc.setFont("NotoSansKR"); return; } catch (e) {}
 
       if (__koreanFontB64) {
@@ -306,7 +363,7 @@
       }
 
       if (!__koreanFontLoading) {
-        __koreanFontLoading = fetch(KOREAN_FONT_URL)
+        __koreanFontLoading = fetch(KOREAN_FONT_URL, { mode: "cors" })
           .then((r) => {
             if (!r.ok) throw new Error("Font download failed");
             return r.arrayBuffer();
@@ -433,9 +490,16 @@
         return;
       }
 
-      const quoteNo = genQuoteNo();
+      // ✅ 화면 입력값
+      const companyName = $('companyName').value?.trim() || '-';
+      const contactName = $('contactName').value?.trim() || '-';
+      const contactEmail = $('contactEmail').value?.trim() || '-';
+
+      // ✅ 견적번호: 입력값 우선, 없으면 자동 생성
+      const quoteNo = ($('quoteNoInput').value || '').trim() || genQuoteNo();
       const quoteDate = new Date().toISOString().slice(0,10);
-      const validUntil = addDaysISO(quoteDate, 20);
+      const validDays = toNum($('validDays').value) || 20;
+      const validUntil = addDaysISO(quoteDate, validDays);
 
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ unit: 'pt', format: 'a4' });
@@ -448,30 +512,36 @@
       let y = 44;
 
       doc.setFontSize(18);
-      doc.text('Quotation (LinkedIn Solutions)', marginX, y);
-      y += 20;
+      doc.text('견적서 (LinkedIn Solutions)', marginX, y);
+      y += 22;
 
       doc.setFontSize(10);
-      doc.text(`Quote No: ${quoteNo}`, marginX, y);
-      doc.text(`Date: ${quoteDate}`, 360, y);
+      doc.text(`견적번호: ${quoteNo}`, marginX, y);
+      doc.text(`견적일자: ${quoteDate}`, 360, y);
       y += 14;
 
-      doc.text(`Valid Until: ${validUntil} (20 days)`, marginX, y);
+      doc.text(`유효기간: ${validUntil} (${validDays}일)`, marginX, y);
       y += 14;
 
-      doc.text('VAT: None', marginX, y);
-      y += 18;
+      doc.text(`회사명: ${companyName}`, marginX, y);
+      y += 14;
+      doc.text(`담당자: ${contactName}`, marginX, y);
+      doc.text(`이메일: ${contactEmail}`, 360, y);
+      y += 16;
+
+      doc.text('VAT: 없음 · Currency: USD', marginX, y);
+      y += 16;
 
       const body = rows.map(r => {
-        const unit = (r.unit == null) ? 'TBD (Inquiry)' : money(r.unit);
+        const unit = (r.unit == null) ? '문의' : money(r.unit);
         const qty = (r.qty == null) ? '-' : String(r.qty);
-        const amt = (r.amount == null) ? 'TBD (Inquiry)' : money(r.amount);
+        const amt = (r.amount == null) ? '문의' : money(r.amount);
         return [r.name, unit, qty, amt];
       });
 
       doc.autoTable({
         startY: y,
-        head: [[ 'Item', 'Unit Price (USD)', 'Qty', 'Amount (USD)' ]],
+        head: [[ '항목', '단가(USD)', '수량', '금액(USD)' ]],
         body,
         styles: { font: 'NotoSansKR', fontSize: 9, cellPadding: 6 },
         headStyles: { fillColor: [11, 18, 32] },
@@ -479,21 +549,22 @@
         margin: { left: marginX, right: marginX },
       });
 
-      const endY = doc.lastAutoTable.finalY + 16;
+      const endY = doc.lastAutoTable.finalY + 18;
       doc.setFontSize(12);
-      doc.text(`Total (USD): ${money(total)}`, 360, endY);
+      doc.text(`합계(USD): ${money(total)}`, 360, endY);
 
       let y2 = endY + 18;
       doc.setFontSize(9);
 
       const lines = [
-        '• 유효기간 내 02-6405-4446으로 문의',
-        '• Life Page는 기업 규모에 따라 금액이 상이. 문의필수',
-        '• 기업용 솔루션 문의: LinkedIn Korea Partner (02-6405-4446 / help@hrpoint.co.kr)'
+        '• 견적서 유효기간 내 Linkedin Korea Partner로 문의 부탁드립니다.',
+        '• 전화 : 02-6405-4446 / E-mail : help@hrpoint.co.kr',
+        '• Life Page는 기업 규모에 따라 금액이 상이합니다. (문의필수)'
       ];
       doc.text(lines.join('\n'), marginX, y2);
 
-      const filename = `LinkedIn_Quotation_${quoteNo}.pdf`;
+      // ✅ 파일명 고정
+      const filename = `[Linkedin] 견적서_(Korea Partner_HR Point).pdf`;
       doc.save(filename);
     };
 
@@ -503,6 +574,10 @@
       qtyJob: $('qtyJob').value || '0',
       lifeInclude: $('lifeInclude').value || 'no',
       qtyLTI: $('qtyLTI').value || '0',
+      companyName: $('companyName').value || '',
+      contactName: $('contactName').value || '',
+      contactEmail: $('contactEmail').value || '',
+      quoteNo: $('quoteNoInput').value || '',
     });
 
     const copyLink = async () => {
@@ -526,11 +601,17 @@
     };
 
     const resetAll = () => {
+      $('companyName').value='';
+      $('contactName').value='';
+      $('contactEmail').value='';
+      $('quoteNoInput').value='';
+
       $('qtyRecruiter').value='0';
       $('aiTier').value='none';
       $('qtyJob').value='0';
       $('lifeInclude').value='no';
       $('qtyLTI').value='0';
+
       history.replaceState({}, '', location.pathname);
       recalc();
       toast('초기화 완료');
@@ -540,16 +621,21 @@
     document.getElementById('btnCopyLink')?.addEventListener('click', (e)=>{e.preventDefault(); copyLink();});
     document.getElementById('btnReset')?.addEventListener('click', (e)=>{e.preventDefault(); resetAll();});
 
-    ['qtyRecruiter','aiTier','qtyJob','lifeInclude','qtyLTI'].forEach(id=>{
+    ['companyName','contactName','contactEmail','quoteNoInput','qtyRecruiter','aiTier','qtyJob','lifeInclude','qtyLTI'].forEach(id=>{
       const el = document.getElementById(id);
       if (!el) return;
       el.addEventListener('input', ()=>recalc());
       el.addEventListener('change', ()=>recalc());
     });
 
-    // URL로 입력값 반영 (선택)
+    // URL로 입력값 반영
     (function applyStateFromLink(){
       const p = new URLSearchParams(location.search);
+      if (p.has('companyName')) document.getElementById('companyName').value = p.get('companyName');
+      if (p.has('contactName')) document.getElementById('contactName').value = p.get('contactName');
+      if (p.has('contactEmail')) document.getElementById('contactEmail').value = p.get('contactEmail');
+      if (p.has('quoteNo')) document.getElementById('quoteNoInput').value = p.get('quoteNo');
+
       if (p.has('qtyRecruiter')) document.getElementById('qtyRecruiter').value = p.get('qtyRecruiter');
       if (p.has('aiTier')) document.getElementById('aiTier').value = p.get('aiTier');
       if (p.has('qtyJob')) document.getElementById('qtyJob').value = p.get('qtyJob');

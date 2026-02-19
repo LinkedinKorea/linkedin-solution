@@ -192,10 +192,6 @@
 
     .toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:rgba(17,24,39,.92);border:1px solid var(--line);padding:10px 12px;border-radius:12px;box-shadow:0 12px 24px rgba(0,0,0,.35);font-size:13px;display:none;z-index:9999}
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
-
-    /* ✅ 오른쪽(요약 카드) 상단 로고 */
-    .liLogoWrap{display:flex;justify-content:center;margin:4px 0 12px}
-    .liLogoImg{max-width:240px;width:100%;height:auto;opacity:.96}
   </style>
 
   <!-- jsPDF -->
@@ -379,16 +375,9 @@
         </div>
       </div>
 
-      <!-- ✅ 오른쪽 계산기(요약) -->
       <div class="card">
         <div class="hd"><b>요약</b><span class="muted">USD 기준</span></div>
         <div class="bd">
-
-          <!-- ✅ 두번째 로고: 계산기 오른쪽 부분에 추가 -->
-          <div class="liLogoWrap">
-            <img id="liLogoRight" class="liLogoImg" alt="LinkedIn Logo" />
-          </div>
-
           <div class="kpis">
             <div class="kpi">
               <div class="t">총 합계</div>
@@ -437,7 +426,6 @@
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -460,23 +448,9 @@
   <div id="pdfRender" style="position:fixed; left:-99999px; top:0; width:794px; background:#ffffff; color:#111827; padding:28px; font-family:'Noto Sans KR', Apple SD Gothic Neo, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;"></div>
 
   <script>
-    // ✅ 로고(업로드된 이미지) Base64 내장
-    const HR_LOGO_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAT4AAAE+CAIAAAC0JXqkAAABO0lEQVR4nO3TQQ0AAAgDINc/9K3hHBQqQk0q1c0AAAD4Y0wAAADwZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAOBmAQAA4GYBAADgZgEAAPB3Aas3gQ0yTt2PAAAAAElFTkSuQmCC";
-    const LI_LOGO_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABQAAAAGzCAYAAAAW+YQnAAAACXBIWXMAAAsSAAALEgHS3X78AAAgAElEQVR4nO3deZxkZ53/8c+Z3ZlZl1t1bQm0m0kQ0gQkQmQxkQ0tVZpYyqW0y8mB2mKx0mM0m8lQkQmQhRkQq0kQ0hT6d3f7+9+V3b+u9+Xr+u9d9+qv8+e+7f/8+3p9z7s8+7wAAABJRU5ErkJggg==";
-
-    // ⚠️ NOTE: 위 HR_LOGO_DATA는 작은 로고(318x318) 기준, LI_LOGO_DATA는 사용자가 올린 로고를 base64로 넣어야 합니다.
-    // 지금은 메시지 크기 제한 때문에 LI_LOGO_DATA를 축약된 형태로 넣었습니다.
-    // 아래 "중요" 안내를 꼭 확인하세요.
-
     const $ = (id) => document.getElementById(id) || {
       value: '', textContent: '', innerHTML: '', style: {}, addEventListener: () => {},
     };
-
-    // ✅ 오른쪽 카드(계산기)에 LinkedIn 로고 표시
-    (function setLogos(){
-      const li = document.getElementById('liLogoRight');
-      if (li) li.src = LI_LOGO_DATA;
-    })();
 
     const PRICES = {
       recruiter: 11350,
@@ -650,16 +624,9 @@
 
       return `
         <!-- ✅ 제목 크게 -->
-        <div style="font-size:28px;font-weight:900;letter-spacing:-.3px;line-height:1.1;text-align:left;">
-          견적서 (LinkedIn Solutions)
-        </div>
+        <div style="font-size:28px;font-weight:900;letter-spacing:-.3px;line-height:1.1;">견적서 (LinkedIn Solutions)</div>
 
-        <!-- ✅ 두번째 로고: PDF 가운데(중앙 정렬) -->
-        <div style="text-align:center;margin-top:10px;margin-bottom:6px;">
-          <img src="${LI_LOGO_DATA}" style="width:260px;max-width:100%;height:auto;" alt="LinkedIn" />
-        </div>
-
-        <div style="display:flex;justify-content:space-between;gap:12px;margin-top:10px;font-size:12px;color:#111827;">
+        <div style="display:flex;justify-content:space-between;gap:12px;margin-top:12px;font-size:12px;color:#111827;">
           <div>
             <div><b>견적번호</b>: ${escapeHtml(quoteNo)}</div>
             <div style="margin-top:4px;"><b>유효기간</b>: ${escapeHtml(validUntil)} (20일)</div>
@@ -771,21 +738,13 @@
         }
       }
 
-      // ✅ PDF 맨 하단: 중앙 텍스트 + 우측 HR 로고
+      // ✅ PDF 맨 하단 가운데 고정 문구 (모든 페이지)
       const footerText = "Linkedin Korea Partner_HR Point";
       const totalPages = doc.getNumberOfPages();
       doc.setFontSize(9);
-
-      const logoW = 26; // pt
-      const logoH = 26; // pt
-      const logoX = pageWidth - margin - logoW;
-      const logoY = pageHeight - 10 - logoH; // 바닥에서 10pt 띄움
-      const textY = pageHeight - 12;
-
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
-        doc.text(footerText, pageWidth / 2, textY, { align: 'center' });
-        doc.addImage(HR_LOGO_DATA, 'PNG', logoX, logoY, logoW, logoH);
+        doc.text(footerText, pageWidth / 2, pageHeight - 12, { align: 'center' });
       }
 
       doc.save(`[Linkedin] 견적서_(Korea Partner_HR Point).pdf`);
@@ -866,18 +825,5 @@
     ensureQuoteNoOnce();
     recalc();
   </script>
-
-  <!--
-    ⭐ 중요 (꼭 확인)
-    지금 코드에서 LI_LOGO_DATA는 메시지 크기 제한 때문에 "축약된 base64"가 들어가 있습니다.
-    아래 방법 중 하나로 반드시 교체해야 합니다.
-
-    (추천) 1) 링크드인 로고 파일을 같은 폴더에 두고:
-       const LI_LOGO_DATA = "LI-Logo.png";  // 또는 ./LI-Logo.png
-       그리고 <img src="LI-Logo.png">로 쓰도록 바꾸기 (CORS 문제 없음)
-
-    또는 2) base64를 전체로 넣기:
-       const LI_LOGO_DATA = "data:image/png;base64,....(전체)...";
-  -->
 </body>
 </html>

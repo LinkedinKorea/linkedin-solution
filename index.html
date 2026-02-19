@@ -33,12 +33,7 @@
     @media (max-width:720px){.row{grid-template-columns:1fr}}
 
     .muted{color:var(--muted);font-size:12px;line-height:1.55}
-
-    .descBox{
-      margin-top:10px;background:var(--soft);border:1px solid rgba(255,255,255,.08);
-      padding:10px 12px;border-radius:12px;color:#cbd5e1;font-size:12px;line-height:1.55;white-space:pre-line
-    }
-
+    .descBox{margin-top:10px;background:var(--soft);border:1px solid rgba(255,255,255,.08);padding:10px 12px;border-radius:12px;color:#cbd5e1;font-size:12px;line-height:1.55;white-space:pre-line}
     .solTitle{font-weight:900;letter-spacing:-.2px;font-size:13px;color:#f3f4f6}
 
     .rowMeta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;align-items:end;padding:12px 0 18px;border-bottom:1px solid rgba(31,41,55,.55)}
@@ -332,7 +327,7 @@
 
   <script>
     // ✅ 최종 WebApp URL (사용자 제공)
-    const SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbx94f4aZKusfxADXipYf8SjFqXvL4A262BKclDz4Uj7stAe4rkJ37aqNGSgBbSkHi-BBg/exec";
+    const SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby_F8URpHtN14zowjDl0h4BGtQ47Q6ZIEkFCjDtEZrio8xS5jJcr50Ic8iylxx0Inojcg/exec";
 
     const $ = (id) => document.getElementById(id) || {
       value: '', textContent: '', innerHTML: '', style: {}, addEventListener: () => {},
@@ -582,13 +577,10 @@
       }).join('; ');
     }
 
-    // ✅ CORS 우회: JSONP 방식(GAS doGet에서 callback 처리 필요)
-    function saveToGoogleSheet(payload){
+    // ✅ CORS 우회: "비콘 이미지" 방식 (GAS doGet이 파라미터 받으면 저장됨)
+    function saveToGoogleSheetBeacon(payload){
       return new Promise((resolve) => {
-        const cbName = `jsonp_cb_${Date.now()}_${Math.floor(Math.random()*100000)}`;
-
         const params = new URLSearchParams();
-        params.set('callback', cbName);
         params.set('savedAt', payload.savedAt || new Date().toISOString());
         params.set('quoteNo', payload.quoteNo || '');
         params.set('companyName', payload.companyName || '');
@@ -598,36 +590,19 @@
         params.set('totalUSD', String(payload.totalUSD ?? ''));
         params.set('selectedCount', String(payload.selectedCount ?? ''));
         params.set('selectedSummary', payload.selectedSummary || '');
-        params.set('selectedItemsJson', JSON.stringify(payload.selectedItems || []));
+        params.set('aiTier', payload.aiTier || '');
         params.set('userAgent', navigator.userAgent || '');
         params.set('pageUrl', location.href || '');
+        params.set('_ts', String(Date.now())); // cache buster
 
         const url = `${SHEET_WEBAPP_URL}?${params.toString()}`;
 
-        window[cbName] = (resp) => {
-          try { delete window[cbName]; } catch(e) { window[cbName] = undefined; }
-          script.remove();
-          resolve(!!(resp && resp.ok));
-        };
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(true); // GAS는 JSON 반환이라 error일 수 있어도 요청은 나감
+        img.src = url;
 
-        const script = document.createElement('script');
-        script.src = url;
-        script.async = true;
-        script.onerror = () => {
-          try { delete window[cbName]; } catch(e) { window[cbName] = undefined; }
-          script.remove();
-          resolve(false);
-        };
-
-        document.body.appendChild(script);
-
-        setTimeout(() => {
-          if (window[cbName]) {
-            try { delete window[cbName]; } catch(e) { window[cbName] = undefined; }
-            script.remove();
-            resolve(false);
-          }
-        }, 10000);
+        setTimeout(() => resolve(true), 2000);
       });
     }
 
@@ -643,7 +618,7 @@
       const contactName  = $('contactName').value?.trim() || '-';
       const contactEmail = $('contactEmail').value?.trim() || '-';
 
-      // ✅ 1) 저장 (JSONP)
+      // ✅ 1) 시트 저장 (비콘)
       const payload = {
         savedAt: new Date().toISOString(),
         quoteNo,
@@ -654,20 +629,11 @@
         totalUSD: Math.round(total || 0),
         selectedCount: rows.length,
         selectedSummary: selectionSummary(rows),
-        selectedItems: rows.map(r => ({
-          key: r.key,
-          name: r.name,
-          qty: r.qty,
-          unitUSD: r.unit,
-          amountUSD: r.amount,
-          tier: r.tier || null
-        }))
+        aiTier
       };
+      await saveToGoogleSheetBeacon(payload);
 
-      const saved = await saveToGoogleSheet(payload);
-      if (!saved) toast('시트 저장이 확인되지 않았지만 PDF는 다운로드합니다.');
-
-      // ✅ 2) PDF 캡처 생성
+      // ✅ 2) PDF 생성(캡처)
       const pdfEl = document.getElementById('pdfRender');
       pdfEl.innerHTML = buildPdfHtml({ quoteNo, quoteDate, validUntil, companyName, contactName, contactEmail, rows, total, aiTier });
 
@@ -713,7 +679,7 @@
         }
       }
 
-      // ✅ PDF 하단 문구 크게 (Arial 요청: 기본폰트 중 helvetica 사용)
+      // ✅ PDF 하단 문구 크게 (Arial 요청: 기본폰트중 helvetica 사용)
       const footerText = "Linkedin Korea Partner_HR Point";
       const totalPages = doc.getNumberOfPages();
       doc.setFont('helvetica', 'normal');
@@ -805,17 +771,8 @@
   </script>
 
   <!--
-    ✅ 중요: Google Apps Script (웹앱) 쪽 doGet(e)가 JSONP(callback)를 지원해야 합니다.
-    아래 Apps Script를 사용하세요(요약):
-
-    function doGet(e){
-      const p = e.parameter;
-      // sheet append...
-      const cb = p.callback;
-      return ContentService
-        .createTextOutput(cb ? `${cb}(${JSON.stringify({ok:true})})` : JSON.stringify({ok:true}))
-        .setMimeType(cb ? ContentService.MimeType.JAVASCRIPT : ContentService.MimeType.JSON);
-    }
+    ✅ 반드시 Apps Script(WebApp) 쪽은 doGet(e)로 파라미터를 받아 시트에 appendRow 해야 합니다.
+    (비콘 방식은 CORS/응답 읽기와 무관하게 요청을 보내기 위해 사용합니다.)
   -->
 </body>
 </html>

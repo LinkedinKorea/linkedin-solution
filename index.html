@@ -559,8 +559,10 @@
     $('btnReset').addEventListener('click', (e)=>{e.preventDefault(); resetAll();});
 
     ;['company','contact','email','quoteNo','quoteDate','qtyRecruiter','aiTier','qtyJob','lifeInclude','qtyLTI'].forEach(id=>{
-      $(id).addEventListener('input', ()=>recalc());
-      $(id).addEventListener('change', ()=>recalc());
+      const el = $(id);
+      if (!el) return;
+      el.addEventListener('input', ()=>recalc());
+      el.addEventListener('change', ()=>recalc());
     });
 
     $('quoteNo').value = genQuoteNo();

@@ -293,8 +293,14 @@
   </div>
 
   <script>
+    // --- DOM helpers (null-safe) ---
     const $ = (id) => document.getElementById(id);
+    const val = (id) => ($ (id) ? $(id).value : '');
+    const setVal = (id, v) => { const el = $(id); if (el) el.value = v; };
+    const setText = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+    const show = (id, on) => { const el = $(id); if (el) el.style.display = on ? 'block' : 'none'; };
 
+    // --- Pricing ---
     const PRICES = {
       recruiter: 11350,
       job: 2010,
@@ -310,19 +316,19 @@
     const nfmt = (n) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(n || 0));
     const money = (n) => `$${nfmt(n)}`;
     const toNum = (v) => {
-      if (v == null) return 0;
-      const s = String(v).replace(/[,\s]/g,'').trim();
+      const s = String(v ?? '').replace(/[\s,]/g, '').trim();
       if (!s) return 0;
       const x = Number(s);
-      return isFinite(x) ? x : 0;
+      return Number.isFinite(x) ? x : 0;
     };
 
     const toast = (msg='완료') => {
       const t = $('toast');
+      if (!t) return;
       t.textContent = msg;
       t.style.display = 'block';
       clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(()=>{t.style.display='none';}, 1600);
+      window.__toastTimer = setTimeout(()=>{ t.style.display='none'; }, 1600);
     };
 
     const genQuoteNo = () => {
@@ -336,241 +342,54 @@
 
     const addDaysISO = (isoDate, days) => {
       if (!isoDate) return '';
-      const d = new Date(isoDate + 'T00:00:00');
+      const d = new Date(`${isoDate}T00:00:00`);
       d.setDate(d.getDate() + days);
       return d.toISOString().slice(0,10);
     };
 
     const setDefaultDates = () => {
-      const d = new Date();
-      const toISO = (dt) => dt.toISOString().slice(0,10);
-      if (!$('quoteDate').value) $('quoteDate').value = toISO(d);
-      $('validUntil').value = addDaysISO($('quoteDate').value, 20);
+      const qd = $('quoteDate');
+      const vu = $('validUntil');
+      if (qd && !qd.value) qd.value = new Date().toISOString().slice(0,10);
+      if (qd && vu) vu.value = addDaysISO(qd.value, 20);
     };
 
-    const buildRows = (state) => {
+    const buildRows = (s) => {
       const rows = [];
-      if (state.qtyRecruiter > 0) rows.push({ name:'Recruiter (인재검색)', unit:PRICES.recruiter, qty:state.qtyRecruiter, amount:state.amtRecruiter });
-      if (state.aiTier !== 'none') rows.push({ name:`AI Hiring Assistant (${PRICES.ai[state.aiTier].label})`, unit:PRICES.ai[state.aiTier].price, qty:1, amount:state.amtAI });
-      if (state.qtyJob > 0) rows.push({ name:'Job Slot (채용공고)', unit:PRICES.job, qty:state.qtyJob, amount:state.amtJob });
-      if (state.lifeInclude === 'yes') rows.push({ name:'Life Page (기업브랜딩/광고) — 문의 필수', unit:null, qty:null, amount:null });
-      if (state.qtyLTI > 0) rows.push({ name:'LTI (경쟁사 분석)', unit:PRICES.lti, qty:state.qtyLTI, amount:state.amtLTI });
+      if (s.qtyRecruiter > 0) rows.push({ name:'Recruiter (인재검색)', unit:PRICES.recruiter, qty:s.qtyRecruiter, amount:s.amtRecruiter });
+      if (s.qtyJob > 0) rows.push({ name:'Job Slot (채용공고)', unit:PRICES.job, qty:s.qtyJob, amount:s.amtJob });
+      if (s.aiTier !== 'none') rows.push({ name:`AI Hiring Assistant (${PRICES.ai[s.aiTier].label})`, unit:PRICES.ai[s.aiTier].price, qty:1, amount:s.amtAI });
+      if (s.lifeInclude === 'yes') rows.push({ name:'Life Page (기업브랜딩/광고) — 문의 필수', unit:null, qty:null, amount:null });
+      if (s.qtyLTI > 0) rows.push({ name:'LTI (경쟁사 분석)', unit:PRICES.lti, qty:s.qtyLTI, amount:s.amtLTI });
       return rows;
     };
 
     const recalc = () => {
-      if ($('quoteDate').value) $('validUntil').value = addDaysISO($('quoteDate').value, 20);
+      // dates
+      const qd = $('quoteDate');
+      if (qd) setVal('validUntil', addDaysISO(qd.value, 20));
 
-      const aiTier = $('aiTier').value;
-      const qtyRecruiter = toNum($('qtyRecruiter').value);
-      const qtyJob = toNum($('qtyJob').value);
-      const qtyLTI = toNum($('qtyLTI').value);
-      const lifeInclude = $('lifeInclude').value;
+      const qtyRecruiter = toNum(val('qtyRecruiter'));
+      const qtyJob = toNum(val('qtyJob'));
+      const qtyLTI = toNum(val('qtyLTI'));
+      const aiTier = val('aiTier') || 'none';
+      const lifeInclude = val('lifeInclude') || 'no';
 
       const amtRecruiter = qtyRecruiter * PRICES.recruiter;
-      const amtAI = (PRICES.ai[aiTier]?.price || 0);
       const amtJob = qtyJob * PRICES.job;
       const amtLTI = qtyLTI * PRICES.lti;
+      const amtAI = PRICES.ai[aiTier]?.price || 0;
 
-      const total = amtRecruiter + amtAI + amtJob + amtLTI;
+      // Life Page: TBD (not counted)
+      const total = amtRecruiter + amtJob + amtAI + amtLTI;
 
-      $('amtRecruiter').value = money(amtRecruiter);
-      $('amtAI').value = money(amtAI);
-      $('amtJob').value = money(amtJob);
-      $('amtLTI').value = money(amtLTI);
-      $('amtLife').value = lifeInclude === 'yes' ? '문의 필수' : '-';
+      setVal('amtRecruiter', money(amtRecruiter));
+      setVal('amtJob', money(amtJob));
+      setVal('amtLTI', money(amtLTI));
+      setVal('amtAI', money(amtAI));
+      setVal('amtLife', lifeInclude === 'yes' ? '문의 필수' : '-');
 
       const cap = PRICES.ai[aiTier]?.cap || 0;
-      $('aiCapacity').value = aiTier === 'none' ? '후보자 직접 검증' : `후보자 ${nfmt(cap)}명 AI 평가/추천`;
-
-      $('total').textContent = money(total);
-      $('total2').textContent = money(total);
-
-      const rows = buildRows({ aiTier, qtyRecruiter, qtyJob, qtyLTI, lifeInclude, amtRecruiter, amtAI, amtJob, amtLTI, total });
-      
-      // 최소 계약 금액 안내
-      const minNotice = document.getElementById('minNotice');
-      if (total > 0 && total < 10000) {
-        if (minNotice) minNotice.style.display = 'block';
-      } else {
-        if (minNotice) minNotice.style.display = 'none';
-      }
-      $('items').textContent = rows.length ? `${rows.length}개 항목` : '-';
-
-      const tb = $('tbody');
-      tb.innerHTML = rows.length ? rows.map(r => {
-        const unit = (r.unit == null) ? '문의' : money(r.unit);
-        const qty = (r.qty == null) ? '-' : nfmt(r.qty);
-        const amt = (r.amount == null) ? '문의' : money(r.amount);
-        return `<tr><td>${r.name}</td><td class="right">${unit}</td><td class="right">${qty}</td><td class="right">${amt}</td></tr>`;
-      }).join('') : `<tr><td colspan="4" class="muted">선택된 항목이 없습니다. 수량/티어를 선택해 주세요.</td></tr>`;
-
-      return { total, rows };
-    };
-
-    const makePdf = () => {
-      const { total, rows } = recalc();
-      const company = $('company').value || '';
-      const contact = $('contact').value || '';
-      const email = $('email').value || '';
-      const quoteNo = $('quoteNo').value || '';
-      const quoteDate = $('quoteDate').value || '';
-      const validUntil = $('validUntil').value || '';
-
-      if (!rows.length) {
-        toast('수량/티어를 선택해 주세요.');
-        return;
-      }
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-
-      const marginX = 40;
-      let y = 44;
-
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(18);
-      doc.text('Quotation (LinkedIn Solutions)', marginX, y);
-      y += 18;
-
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
-      doc.text(`Quote No: ${quoteNo}`, marginX, y);
-      doc.text(`Date: ${quoteDate}`, 360, y);
-      y += 14;
-      doc.text(`Valid Until: ${validUntil} (20 days)`, marginX, y);
-      y += 14;
-      doc.text('VAT: None', marginX, y);
-      y += 16;
-
-      doc.setFontSize(10);
-      doc.text(`Company: ${company}`, marginX, y);
-      y += 14;
-      doc.text(`Contact: ${contact}`, marginX, y);
-      doc.text(`Email: ${email}`, 360, y);
-      y += 18;
-
-      const body = rows.map(r => {
-        const unit = (r.unit == null) ? 'TBD (Inquiry)' : money(r.unit);
-        const qty = (r.qty == null) ? '-' : String(r.qty);
-        const amt = (r.amount == null) ? 'TBD (Inquiry)' : money(r.amount);
-        return [r.name, unit, qty, amt];
-      });
-
-      doc.autoTable({
-        startY: y,
-        head: [[ 'Item', 'Unit Price (USD)', 'Qty', 'Amount (USD)' ]],
-        body,
-        styles: { font: 'helvetica', fontSize: 9, cellPadding: 6 },
-        headStyles: { fillColor: [11, 18, 32] },
-        columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' } },
-        margin: { left: marginX, right: marginX },
-      });
-
-      const endY = doc.lastAutoTable.finalY + 16;
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(12);
-      doc.text(`Total (USD): ${money(total)}`, 360, endY);
-
-      let y2 = endY + 18;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      const lines = [
-        '• 유효기간 내 02-6405-4446으로 문의',
-        '• Life Page는 기업 규모/구성에 따라 가격이 상이하여 문의가 필요합니다.',
-        '• 기업용 솔루션 문의: LinkedIn Korea Partner (02-6405-4446 / help@hrpoint.co.kr)'
-      ];
-      doc.text(lines.join('\n'), marginX, y2);
-
-      const filename = `LinkedIn_Quotation_${quoteNo || 'quote'}.pdf`;
-      doc.save(filename);
-    };
-
-    const getStateForLink = () => ({
-      company: $('company').value || '',
-      contact: $('contact').value || '',
-      email: $('email').value || '',
-      quoteNo: $('quoteNo').value || '',
-      quoteDate: $('quoteDate').value || '',
-      qtyRecruiter: $('qtyRecruiter').value || '0',
-      aiTier: $('aiTier').value || 'none',
-      qtyJob: $('qtyJob').value || '0',
-      lifeInclude: $('lifeInclude').value || 'no',
-      qtyLTI: $('qtyLTI').value || '0',
-    });
-
-    const applyStateFromLink = () => {
-      const p = new URLSearchParams(location.search);
-      const set = (id, key) => { if (p.has(key)) $(id).value = p.get(key); };
-
-      set('company','company');
-      set('contact','contact');
-      set('email','email');
-      set('quoteNo','quoteNo');
-      set('quoteDate','quoteDate');
-      set('qtyRecruiter','qtyRecruiter');
-      if (p.has('aiTier')) $('aiTier').value = p.get('aiTier');
-      set('qtyJob','qtyJob');
-      if (p.has('lifeInclude')) $('lifeInclude').value = p.get('lifeInclude');
-      set('qtyLTI','qtyLTI');
-
-      setDefaultDates();
-    };
-
-    const copyLink = async () => {
-      const s = getStateForLink();
-      const p = new URLSearchParams();
-      Object.entries(s).forEach(([k,v]) => { if (String(v).trim() !== '') p.set(k, v); });
-      const url = `${location.origin}${location.pathname}?${p.toString()}`;
-
-      try{
-        await navigator.clipboard.writeText(url);
-        toast('입력값 링크가 복사되었습니다.');
-      }catch(e){
-        const ta = document.createElement('textarea');
-        ta.value = url;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        toast('입력값 링크가 복사되었습니다.');
-      }
-    };
-
-    const resetAll = () => {
-      $('company').value='';
-      $('contact').value='';
-      $('email').value='';
-      $('qtyRecruiter').value='0';
-      $('aiTier').value='none';
-      $('qtyJob').value='0';
-      $('lifeInclude').value='no';
-      $('qtyLTI').value='0';
-      $('quoteNo').value = genQuoteNo();
-      $('quoteDate').value = '';
-      setDefaultDates();
-      history.replaceState({}, '', location.pathname);
-      recalc();
-      toast('초기화 완료');
-    };
-
-    $('btnPdf').addEventListener('click', (e)=>{e.preventDefault(); makePdf();});
-    $('btnCopyLink').addEventListener('click', (e)=>{e.preventDefault(); copyLink();});
-    $('btnReset').addEventListener('click', (e)=>{e.preventDefault(); resetAll();});
-
-    ;['company','contact','email','quoteNo','quoteDate','qtyRecruiter','aiTier','qtyJob','lifeInclude','qtyLTI'].forEach(id=>{
-      const el = $(id);
-      if (!el) return;
-      el.addEventListener('input', ()=>recalc());
-      el.addEventListener('change', ()=>recalc());
-    });
-
-    $('quoteNo').value = genQuoteNo();
-    setDefaultDates();
-    applyStateFromLink();
-    if (!$('quoteNo').value) $('quoteNo').value = genQuoteNo();
-    setDefaultDates();
-    recalc();
-  </script>
+      setVal('aiCapacity', aiTier === 'none' ? '후보자 직접 검증' : `후보
 </body>
 </html>

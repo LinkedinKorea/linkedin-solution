@@ -8,6 +8,14 @@
     :root{
       --bg:#0b0f14;--card:#111827;--muted:#9ca3af;--text:#e5e7eb;--accent:#60a5fa;--line:#1f2937;
       --soft:#ffffff12;
+
+      --disabledBg: rgba(255,255,255,.06);
+      --disabledText: rgba(229,231,235,.7);
+      --disabledBorder: rgba(255,255,255,.10);
+
+      --autoBg: rgba(96,165,250,.10);
+      --autoBorder: rgba(96,165,250,.22);
+      --autoText: rgba(219,234,254,.95);
     }
     *{box-sizing:border-box}
     body{
@@ -16,8 +24,6 @@
       background:linear-gradient(180deg,#070a0f,#0b0f14 40%);
       color:var(--text)
     }
-    a{color:var(--accent);text-decoration:none}
-    a:hover{text-decoration:underline}
 
     .wrap{max-width:1240px;margin:0 auto;padding:28px 18px 120px}
     .top{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap}
@@ -36,10 +42,9 @@
     label{display:block;font-size:12px;color:#cbd5e1;margin-bottom:6px}
     input, select{width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--line);background:#0b1220;color:var(--text);outline:none}
     input:focus, select:focus{border-color:rgba(96,165,250,.6);box-shadow:0 0 0 3px rgba(96,165,250,.14)}
-    input[readonly]{opacity:.9}
+    input[readonly]{opacity:.95}
 
     .rows{display:grid;gap:22px}
-
     .row{
       display:grid;
       grid-template-columns: 1fr 200px 220px;
@@ -93,6 +98,61 @@
       .rowMeta2{grid-template-columns:1fr}
     }
 
+    /* ✅ 비활성(선택 불가) 표시 강화 */
+    .readonlyDim{
+      background: var(--disabledBg) !important;
+      border-color: var(--disabledBorder) !important;
+      color: var(--disabledText) !important;
+      box-shadow:none !important;
+    }
+    .labelDim{ color: rgba(203,213,225,.65) !important; }
+
+    /* ✅ 자동 계산/참고 영역 박스 */
+    .autoBox{
+      border:1px solid var(--autoBorder);
+      background:var(--autoBg);
+      border-radius:16px;
+      padding:12px 12px;
+    }
+    .autoHead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .autoBadge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid var(--autoBorder);
+      background:rgba(96,165,250,.10);
+      color:var(--autoText);
+      font-size:12px;
+      font-weight:800;
+    }
+    .autoBadge .dot{
+      width:8px;height:8px;border-radius:999px;
+      background:rgba(96,165,250,.95);
+      box-shadow:0 0 0 3px rgba(96,165,250,.18);
+    }
+    .autoNote{
+      color:rgba(219,234,254,.8);
+      font-size:12px;
+      line-height:1.5;
+    }
+    .autoGrid{
+      display:grid;
+      grid-template-columns: 1fr 220px 220px;
+      gap:14px;
+      align-items:end;
+    }
+    @media (max-width:720px){
+      .autoGrid{grid-template-columns:1fr}
+    }
+
     table{width:100%;border-collapse:separate;border-spacing:0}
     th, td{padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:top}
     th{font-size:12px;color:#cbd5e1;text-align:left;background:rgba(11,18,32,.35)}
@@ -142,7 +202,7 @@
           <div class="rowMeta">
             <div>
               <label for="companyName">회사명</label>
-              <input id="companyName" placeholder="예) HR Point" />
+              <input id="companyName" placeholder="예) Samsung" />
             </div>
             <div>
               <label for="contactName">담당자</label>
@@ -169,7 +229,7 @@
 
             <div class="row">
               <div>
-                <div class="solTitle">Recruiter (인재검색) — $11,350 / 라이선스</div>
+                <div class="solTitle">Recruiter (인재검색)</div>
                 <div class="descBox">13억명의 가입자를 언제든 검색하고, 인맥과 관련없이 메시지를 보낼 수 있습니다.</div>
               </div>
               <div>
@@ -188,7 +248,7 @@
 
             <div class="row">
               <div>
-                <div class="solTitle">Job Slot (채용공고) — $2,010 / 슬롯</div>
+                <div class="solTitle">Job Slot (채용공고)</div>
                 <div class="descBox">직무별 채용공고를 오픈하고, 후보자를 지속적으로 모집합니다.</div>
               </div>
               <div>
@@ -207,7 +267,7 @@
 
             <div class="row">
               <div>
-                <div class="solTitle">AI Hiring Assistant (Recruiter 옵션) — Tier 선택</div>
+                <div class="solTitle">AI Hiring Assistant (Recruiter 옵션)</div>
                 <div class="descBox">JD 업로드 → 원하는 수 만큼 후보자 AI 평가 및 추천(채용담당자 검토시간 축소)</div>
                 <div class="hint">AI Hiring Assistant는 Recruiter 솔루션 + 옵션상품입니다.</div>
               </div>
@@ -226,21 +286,31 @@
               </div>
             </div>
 
-            <div class="row">
-              <div class="muted" style="margin-top:-6px">※ AI Assistant 금액은 선택한 Tier 단가로 계산됩니다(수량 없음).</div>
-              <div>
-                <label>AI 평가/추천 가능 수</label>
-                <input id="aiCapacity" readonly />
+            <!-- ✅ 자동 계산/참고 영역: 완전히 다른 박스 스타일 -->
+            <div class="autoBox">
+              <div class="autoHead">
+                <div class="autoBadge"><span class="dot"></span>자동 계산 영역</div>
+                <div class="autoNote">선택값에 따라 자동으로 표시됩니다 (선택 불가)</div>
               </div>
-              <div>
-                <label>참고</label>
-                <input value="Recruiter 옵션" readonly />
+
+              <div class="autoGrid">
+                <div class="muted">※ AI Assistant 금액은 선택한 Tier 단가로 계산됩니다(수량 없음).</div>
+
+                <div>
+                  <label class="labelDim">AI 평가/추천 가능 수</label>
+                  <input id="aiCapacity" class="readonlyDim" readonly />
+                </div>
+
+                <div>
+                  <label class="labelDim">참고</label>
+                  <input class="readonlyDim" value="Recruiter 계약 필수" readonly />
+                </div>
               </div>
             </div>
 
             <div class="row">
               <div>
-                <div class="solTitle">Life Page (기업브랜딩/광고) — 문의 필수</div>
+                <div class="solTitle">Life Page (기업브랜딩/광고)</div>
                 <div class="descBox">기업 규모/목표/구성(탭 수 등)에 따라 가격이 상이합니다. 정확한 견적은 문의가 필요합니다.</div>
               </div>
               <div>
@@ -258,7 +328,7 @@
 
             <div class="row">
               <div>
-                <div class="solTitle">LTI (경쟁사 분석) — $12,500 / 라이선스</div>
+                <div class="solTitle">LTI (경쟁사 분석)</div>
                 <div class="descBox">경쟁사의 인력현황 및 역량 분석을 통해 지금 우리에게 필요한 것이 무엇인지 전략을 세울 수 있습니다.</div>
               </div>
               <div>
@@ -441,7 +511,7 @@
       return `${yyyymmdd()}-LK-${rnd}`;
     };
 
-    // ✅ 페이지 로드시 1번 생성해서 유지 (세션동안 동일)
+    // ✅ 페이지 로드시 1회 생성해서 유지 (세션동안 동일)
     function ensureQuoteNoOnce() {
       const KEY = "lk_quote_no_v1";
       const fromUrl = new URLSearchParams(location.search).get("quoteNo");
@@ -531,9 +601,7 @@
       const contactName = $('contactName').value?.trim() || '-';
       const contactEmail = $('contactEmail').value?.trim() || '-';
 
-      // ✅ 페이지에서 한번 생성된 견적번호 사용(고정)
       const quoteNo = $('quoteNoInput').value || ensureQuoteNoOnce();
-
       const quoteDate = new Date().toISOString().slice(0,10);
       const validUntil = addDaysISO(quoteDate, 20);
 
@@ -610,7 +678,6 @@
       companyName: $('companyName').value || '',
       contactName: $('contactName').value || '',
       contactEmail: $('contactEmail').value || '',
-      // ✅ 견적번호도 링크에 포함 (공유 시 동일 번호 유지)
       quoteNo: $('quoteNoInput').value || '',
     });
 
@@ -635,7 +702,7 @@
     };
 
     const resetAll = () => {
-      sessionStorage.removeItem("lk_quote_no_v1"); // ✅ 리셋 시 견적번호도 새로
+      sessionStorage.removeItem("lk_quote_no_v1");
 
       $('companyName').value='';
       $('contactName').value='';
@@ -677,7 +744,6 @@
       if (p.has('qtyLTI')) document.getElementById('qtyLTI').value = p.get('qtyLTI');
     })();
 
-    // ✅ 여기서 1회 생성(또는 URL/세션 값 유지)
     ensureQuoteNoOnce();
     recalc();
   </script>

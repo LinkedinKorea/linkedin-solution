@@ -587,7 +587,12 @@
       if (!rows.length) { toast('수량/티어를 선택해 주세요.'); return; }
 
       const quoteNo = $('quoteNoInput').value || ensureQuoteNoOnce();
-      const quoteDate = new Date().toISOString().slice(0,10);
+      const quoteDate = new Intl.DateTimeFormat('sv-SE', {
+  timeZone: 'Asia/Seoul',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit'
+}).format(new Date()); // 결과: YYYY-MM-DD
       const validUntil = addDaysISO(quoteDate, 20);
 
       // ✅ 저장용은 빈 값이면 빈 값으로(시트에 '-' 저장 방지)

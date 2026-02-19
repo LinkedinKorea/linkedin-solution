@@ -53,10 +53,9 @@
     input[readonly]{opacity:.95}
 
     .rows{display:grid;gap:22px}
-
     .row{
       display:grid;
-      grid-template-columns: 1fr 240px 220px; /* ✅ Tier 글자 안 짤리도록 가운데 컬럼 확장 */
+      grid-template-columns: 1fr 240px 220px;
       gap:14px;
       align-items:center;
       padding:14px 0;
@@ -66,8 +65,8 @@
     @media (max-width:720px){.row{grid-template-columns:1fr}}
 
     .muted{color:var(--muted);font-size:12px;line-height:1.55}
-    .hint{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.35;min-height:0}
 
+    /* ✅ 설명란: 의도한 줄바꿈 그대로 */
     .descBox{
       margin-top:10px;
       background:var(--soft);
@@ -77,6 +76,7 @@
       color:#cbd5e1;
       font-size:12px;
       line-height:1.55;
+      white-space: pre-line;  /* ✅ 줄바꿈 유지 */
     }
 
     .solTitle{
@@ -107,7 +107,6 @@
       .rowMeta2{grid-template-columns:1fr}
     }
 
-    /* ✅ 비활성 표시 */
     .readonlyDim{
       background: var(--disabledBg) !important;
       border-color: var(--disabledBorder) !important;
@@ -116,7 +115,6 @@
     }
     .labelDim{ color: rgba(203,213,225,.65) !important; }
 
-    /* ✅ AI 참고 박스 */
     .aiBox{
       border:1px solid var(--autoBorder);
       background:var(--autoBg);
@@ -138,7 +136,7 @@
       border-radius:999px;
       border:1px solid var(--autoBorder);
       background:rgba(96,165,250,.10);
-      color:var(--autoText);
+      color:rgba(219,234,254,.95);
       font-size:12px;
       font-weight:900;
     }
@@ -159,18 +157,15 @@
       gap:14px;
       align-items:end;
     }
-    @media (max-width:720px){
-      .aiGrid{grid-template-columns:1fr}
-    }
+    @media (max-width:720px){ .aiGrid{grid-template-columns:1fr} }
     .aiSmall{
-      font-size:11px;          /* ✅ 내용 더 작게 */
+      font-size:11px;
       line-height:1.35;
-      white-space:pre-line;    /* ✅ 줄바꿈 유지 */
+      white-space:pre-line;
     }
 
-    /* ✅ Tier 선택 박스: 텍스트 잘림 방지 */
     #aiTier{
-      padding-right:34px;      /* 화살표 공간 확보 */
+      padding-right:34px;
       text-overflow:ellipsis;
       white-space:nowrap;
       overflow:hidden;
@@ -253,7 +248,8 @@
             <div class="row">
               <div>
                 <div class="solTitle">Recruiter (인재검색)</div>
-                <div class="descBox">13억명의 가입자를 언제든 검색하고, 인맥과 관련없이 메시지를 보낼 수 있습니다.</div>
+                <div class="descBox">• 13억+ 가입자 풀에서 후보자를 검색합니다.
+• 인맥 여부와 관계없이 메시지(InMail) 발송이 가능합니다.</div>
               </div>
               <div>
                 <label for="qtyRecruiter">수량(라이선스)</label>
@@ -272,7 +268,8 @@
             <div class="row">
               <div>
                 <div class="solTitle">Job Slot (채용공고)</div>
-                <div class="descBox">직무별 채용공고를 오픈하고, 후보자를 지속적으로 모집합니다.</div>
+                <div class="descBox">• 직무별 채용공고를 게시하고 후보자를 지속적으로 모집합니다.
+• 지원자 파이프라인을 운영하며 공고 성과를 관리합니다.</div>
               </div>
               <div>
                 <label for="qtyJob">수량(슬롯)</label>
@@ -291,7 +288,8 @@
             <div class="row">
               <div>
                 <div class="solTitle">AI Hiring Assistant (Recruiter 옵션)</div>
-                <div class="descBox">JD 업로드 → 원하는 수 만큼 후보자 AI 평가 및 추천(채용담당자 검토시간 축소)</div>
+                <div class="descBox">• JD 업로드 후 후보자를 AI로 평가/추천합니다.
+• 채용담당자의 초기 검토 시간을 줄여 효율을 높입니다.</div>
               </div>
               <div>
                 <label for="aiTier">Tier</label>
@@ -308,7 +306,6 @@
               </div>
             </div>
 
-            <!-- ✅ AI 참고사항 박스 -->
             <div class="aiBox">
               <div class="aiHead">
                 <div class="aiBadge"><span class="dot"></span>AI Assistant 참고사항</div>
@@ -324,7 +321,7 @@
                 </div>
 
                 <div>
-                  <label class="labelDim">채용공고 지원자</label>
+                  <label class="labelDim">채용공고 지원자 중 AI평가 및 추천</label>
                   <input id="aiApplicantCap" class="readonlyDim aiSmall" readonly />
                 </div>
               </div>
@@ -333,7 +330,8 @@
             <div class="row">
               <div>
                 <div class="solTitle">Life Page (기업브랜딩/광고)</div>
-                <div class="descBox">기업규모에 따른 가격 상이. 문의 필수</div>
+                <div class="descBox">• 기업규모에 따른 가격 상이
+• 문의 필수</div>
               </div>
               <div>
                 <label for="lifeInclude">포함 여부</label>
@@ -351,7 +349,8 @@
             <div class="row">
               <div>
                 <div class="solTitle">LTI (경쟁사 분석)</div>
-                <div class="descBox">경쟁사의 인력현황 및 역량 분석을 통해 지금 우리에게 필요한 것이 무엇인지 전략을 세울 수 있습니다.</div>
+                <div class="descBox">• 경쟁사의 인력현황 및 역량을 분석합니다.
+• 인재 전략 수립을 위한 인사이트를 제공합니다.</div>
               </div>
               <div>
                 <label for="qtyLTI">수량(라이선스)</label>
@@ -452,7 +451,6 @@
       addEventListener: () => {},
     };
 
-    // ===== PDF 한글 폰트 로딩 =====
     const KOREAN_FONT_URL =
       "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/notosanskr/NotoSansKR-Regular.ttf";
 
@@ -497,9 +495,9 @@
       lti: 12500,
       ai: {
         none: { price: 0, search: 0, app: 0, label: '선택 안 함' },
-        t1: { price: 3170, search: 200, app: 3500, label: 'Tier 1' },
-        t2: { price: 6910, search: 800, app: 9000, label: 'Tier 2' },
-        t3: { price: 10365, search: 1500, app: 25000, label: 'Tier 3' },
+        t1: { price: 3170, search: 200,  app: 3500,  label: 'Tier 1' },
+        t2: { price: 6910, search: 800,  app: 9000,  label: 'Tier 2' },
+        t3: { price: 10365,search: 1500, app: 25000, label: 'Tier 3' },
       }
     };
 
@@ -521,7 +519,6 @@
       window.__toastTimer = setTimeout(()=>{t.style.display='none';}, 1600);
     };
 
-    // ✅ 오늘 날짜(YYYYMMDD) + 랜덤코드 포함
     const yyyymmdd = (d=new Date()) => {
       const y = d.getFullYear();
       const m = String(d.getMonth()+1).padStart(2,'0');
@@ -533,7 +530,6 @@
       return `${yyyymmdd()}-LK-${rnd}`;
     };
 
-    // ✅ 페이지 로드시 1회 생성해서 유지 (세션동안 동일)
     function ensureQuoteNoOnce() {
       const KEY = "lk_quote_no_v1";
       const fromUrl = new URLSearchParams(location.search).get("quoteNo");
@@ -692,7 +688,6 @@
 
       let y2 = doc.lastAutoTable.finalY + 14;
 
-      // ✅ PDF에도 AI 참고사항(선택 시) 추가
       if (aiTier !== 'none') {
         const t = PRICES.ai[aiTier];
         doc.setFontSize(10);
@@ -720,22 +715,18 @@
       doc.save(`[Linkedin] 견적서_(Korea Partner_HR Point).pdf`);
     };
 
-    const getStateForLink = () => ({
-      qtyRecruiter: $('qtyRecruiter').value || '0',
-      aiTier: $('aiTier').value || 'none',
-      qtyJob: $('qtyJob').value || '0',
-      lifeInclude: $('lifeInclude').value || 'no',
-      qtyLTI: $('qtyLTI').value || '0',
-      companyName: $('companyName').value || '',
-      contactName: $('contactName').value || '',
-      contactEmail: $('contactEmail').value || '',
-      quoteNo: $('quoteNoInput').value || '',
-    });
-
     const copyLink = async () => {
-      const s = getStateForLink();
-      const p = new URLSearchParams();
-      Object.entries(s).forEach(([k,v]) => { if (String(v).trim() !== '') p.set(k, v); });
+      const p = new URLSearchParams({
+        qtyRecruiter: $('qtyRecruiter').value || '0',
+        aiTier: $('aiTier').value || 'none',
+        qtyJob: $('qtyJob').value || '0',
+        lifeInclude: $('lifeInclude').value || 'no',
+        qtyLTI: $('qtyLTI').value || '0',
+        companyName: $('companyName').value || '',
+        contactName: $('contactName').value || '',
+        contactEmail: $('contactEmail').value || '',
+        quoteNo: $('quoteNoInput').value || '',
+      });
       const url = `${location.origin}${location.pathname}?${p.toString()}`;
 
       try{

@@ -5,26 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LinkedIn 기업용 솔루션 자동 견적서</title>
   <style>
-    :root{
-      --bg:#0b0f14;--card:#111827;--muted:#9ca3af;--text:#e5e7eb;--accent:#60a5fa;--line:#1f2937;
-      --soft:#ffffff12;
-
-      --disabledBg: rgba(255,255,255,.06);
-      --disabledText: rgba(229,231,235,.78);
-      --disabledBorder: rgba(255,255,255,.10);
-
-      --autoBg: rgba(96,165,250,.10);
-      --autoBorder: rgba(96,165,250,.22);
-      --autoText: rgba(219,234,254,.95);
-    }
+    :root{--bg:#0b0f14;--card:#111827;--muted:#9ca3af;--text:#e5e7eb;--accent:#60a5fa;--line:#1f2937;--soft:#ffffff12}
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,Helvetica,Arial;
-      background:linear-gradient(180deg,#070a0f,#0b0f14 40%);
-      color:var(--text)
-    }
-
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,Helvetica,Arial;background:linear-gradient(180deg,#070a0f,#0b0f14 40%);color:var(--text)}
     .wrap{max-width:1240px;margin:0 auto;padding:28px 18px 120px}
     .top{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap}
     h1{margin:0;font-size:22px;letter-spacing:-.2px}
@@ -40,135 +23,41 @@
     .bd{padding:16px}
 
     label{display:block;font-size:12px;color:#cbd5e1;margin-bottom:6px}
-    input, select{
-      width:100%;
-      padding:12px 12px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#0b1220;
-      color:var(--text);
-      outline:none;
-    }
+    input, select{width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--line);background:#0b1220;color:var(--text);outline:none}
     input:focus, select:focus{border-color:rgba(96,165,250,.6);box-shadow:0 0 0 3px rgba(96,165,250,.14)}
     input[readonly]{opacity:.95}
 
     .rows{display:grid;gap:22px}
-    .row{
-      display:grid;
-      grid-template-columns: 1fr 240px 220px;
-      gap:14px;
-      align-items:center;
-      padding:14px 0;
-      border-bottom: 1px solid rgba(31,41,55,.55);
-    }
+    .row{display:grid;grid-template-columns:1fr 240px 220px;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid rgba(31,41,55,.55)}
     .row:last-child{border-bottom:none}
     @media (max-width:720px){.row{grid-template-columns:1fr}}
 
     .muted{color:var(--muted);font-size:12px;line-height:1.55}
 
     .descBox{
-      margin-top:10px;
-      background:var(--soft);
-      border:1px solid rgba(255,255,255,.08);
-      padding:10px 12px;
-      border-radius:12px;
-      color:#cbd5e1;
-      font-size:12px;
-      line-height:1.55;
-      white-space: pre-line;
+      margin-top:10px;background:var(--soft);border:1px solid rgba(255,255,255,.08);
+      padding:10px 12px;border-radius:12px;color:#cbd5e1;font-size:12px;line-height:1.55;white-space:pre-line
     }
 
-    .solTitle{
-      font-weight:900;
-      letter-spacing:-.2px;
-      font-size:13px;
-      color:#f3f4f6;
-    }
+    .solTitle{font-weight:900;letter-spacing:-.2px;font-size:13px;color:#f3f4f6}
 
-    .rowMeta{
-      display:grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap:14px;
-      align-items:end;
-      padding:12px 0 18px;
-      border-bottom: 1px solid rgba(31,41,55,.55);
-    }
-    .rowMeta2{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:14px;
-      align-items:end;
-      padding:16px 0 6px;
-      border-bottom: 1px solid rgba(31,41,55,.55);
-    }
-    @media (max-width:720px){
-      .rowMeta{grid-template-columns:1fr}
-      .rowMeta2{grid-template-columns:1fr}
-    }
+    .rowMeta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;align-items:end;padding:12px 0 18px;border-bottom:1px solid rgba(31,41,55,.55)}
+    .rowMeta2{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:end;padding:16px 0 6px;border-bottom:1px solid rgba(31,41,55,.55)}
+    @media (max-width:720px){.rowMeta{grid-template-columns:1fr}.rowMeta2{grid-template-columns:1fr}}
 
-    .readonlyDim{
-      background: var(--disabledBg) !important;
-      border-color: var(--disabledBorder) !important;
-      color: var(--disabledText) !important;
-      box-shadow:none !important;
-    }
-    .labelDim{ color: rgba(203,213,225,.65) !important; }
+    .readonlyDim{background:rgba(255,255,255,.06)!important;border-color:rgba(255,255,255,.10)!important;color:rgba(229,231,235,.78)!important;box-shadow:none!important}
+    .labelDim{color:rgba(203,213,225,.65)!important}
 
-    .aiBox{
-      border:1px solid var(--autoBorder);
-      background:var(--autoBg);
-      border-radius:16px;
-      padding:12px 12px;
-    }
-    .aiHead{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:10px;
-    }
-    .aiBadge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:7px 10px;
-      border-radius:999px;
-      border:1px solid var(--autoBorder);
-      background:rgba(96,165,250,.10);
-      color:rgba(219,234,254,.95);
-      font-size:12px;
-      font-weight:900;
-    }
-    .aiBadge .dot{
-      width:8px;height:8px;border-radius:999px;
-      background:rgba(96,165,250,.95);
-      box-shadow:0 0 0 3px rgba(96,165,250,.18);
-    }
-    .aiReq{
-      color:rgba(219,234,254,.85);
-      font-size:12px;
-      font-weight:800;
-      letter-spacing:-.1px;
-    }
-    .aiGrid{
-      display:grid;
-      grid-template-columns: 1fr 220px 220px;
-      gap:14px;
-      align-items:end;
-    }
-    @media (max-width:720px){ .aiGrid{grid-template-columns:1fr} }
-    .aiSmall{
-      font-size:11px;
-      line-height:1.35;
-      white-space:pre-line;
-    }
+    .aiBox{border:1px solid rgba(96,165,250,.22);background:rgba(96,165,250,.10);border-radius:16px;padding:12px 12px}
+    .aiHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+    .aiBadge{display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border-radius:999px;border:1px solid rgba(96,165,250,.22);background:rgba(96,165,250,.10);color:rgba(219,234,254,.95);font-size:12px;font-weight:900}
+    .aiBadge .dot{width:8px;height:8px;border-radius:999px;background:rgba(96,165,250,.95);box-shadow:0 0 0 3px rgba(96,165,250,.18)}
+    .aiReq{color:rgba(219,234,254,.85);font-size:12px;font-weight:800;letter-spacing:-.1px}
+    .aiGrid{display:grid;grid-template-columns:1fr 220px 220px;gap:14px;align-items:end}
+    @media (max-width:720px){.aiGrid{grid-template-columns:1fr}}
+    .aiSmall{font-size:11px;line-height:1.35;white-space:pre-line}
 
-    #aiTier{
-      padding-right:34px;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-      overflow:hidden;
-    }
+    #aiTier{padding-right:34px;text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
 
     table{width:100%;border-collapse:separate;border-spacing:0}
     th, td{padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:top}
@@ -194,9 +83,7 @@
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
   </style>
 
-  <!-- jsPDF -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" crossorigin="anonymous"></script>
-  <!-- 캡처 기반 PDF -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -441,13 +328,11 @@
     </div>
   </div>
 
-  <!-- PDF 렌더링용 숨김 영역 -->
   <div id="pdfRender" style="position:fixed; left:-99999px; top:0; width:794px; background:#ffffff; color:#111827; padding:28px; font-family:'Noto Sans KR', Apple SD Gothic Neo, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;"></div>
 
   <script>
-    const SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyPi00HgMEItT-hd0zdL2a7vsvF94ls2LAkl_2JJ97RSznK52yifpjT3em4SIYNSmvMSA/exec";
-
-
+    // ✅ 최종 WebApp URL (사용자 제공)
+    const SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbx94f4aZKusfxADXipYf8SjFqXvL4A262BKclDz4Uj7stAe4rkJ37aqNGSgBbSkHi-BBg/exec";
 
     const $ = (id) => document.getElementById(id) || {
       value: '', textContent: '', innerHTML: '', style: {}, addEventListener: () => {},
@@ -690,8 +575,6 @@
     }
 
     function selectionSummary(rows){
-      // 시트에 적재하기 쉬운 문자열 요약
-      // 예) Recruiter x2; Job Slot x1; AI Tier2; Life Page; LTI x1
       return rows.map(r => {
         if (r.key === 'AI Hiring Assistant') return `AI(${r.tier || ''}) x1`;
         if (r.qty == null) return `${r.key}`;
@@ -699,32 +582,53 @@
       }).join('; ');
     }
 
-    async function saveToGoogleSheet(payload){
-      // Apps Script WebApp이 JSON POST를 받는다고 가정
-      // (CORS가 막혀있으면 no-cors로라도 요청은 나갑니다. 응답 확인은 불가)
-      try{
-        const res = await fetch(SHEET_WEBAPP_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        // 응답이 JSON이 아닐 수도 있어 안전 처리
-        try { await res.text(); } catch (e) {}
-        return true;
-      } catch (e) {
-        // no-cors fallback (응답 확인 불가)
-        try{
-          await fetch(SHEET_WEBAPP_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          });
-          return true;
-        }catch(_){
-          return false;
-        }
-      }
+    // ✅ CORS 우회: JSONP 방식(GAS doGet에서 callback 처리 필요)
+    function saveToGoogleSheet(payload){
+      return new Promise((resolve) => {
+        const cbName = `jsonp_cb_${Date.now()}_${Math.floor(Math.random()*100000)}`;
+
+        const params = new URLSearchParams();
+        params.set('callback', cbName);
+        params.set('savedAt', payload.savedAt || new Date().toISOString());
+        params.set('quoteNo', payload.quoteNo || '');
+        params.set('companyName', payload.companyName || '');
+        params.set('contactName', payload.contactName || '');
+        params.set('contactEmail', payload.contactEmail || '');
+        params.set('currency', payload.currency || 'USD');
+        params.set('totalUSD', String(payload.totalUSD ?? ''));
+        params.set('selectedCount', String(payload.selectedCount ?? ''));
+        params.set('selectedSummary', payload.selectedSummary || '');
+        params.set('selectedItemsJson', JSON.stringify(payload.selectedItems || []));
+        params.set('userAgent', navigator.userAgent || '');
+        params.set('pageUrl', location.href || '');
+
+        const url = `${SHEET_WEBAPP_URL}?${params.toString()}`;
+
+        window[cbName] = (resp) => {
+          try { delete window[cbName]; } catch(e) { window[cbName] = undefined; }
+          script.remove();
+          resolve(!!(resp && resp.ok));
+        };
+
+        const script = document.createElement('script');
+        script.src = url;
+        script.async = true;
+        script.onerror = () => {
+          try { delete window[cbName]; } catch(e) { window[cbName] = undefined; }
+          script.remove();
+          resolve(false);
+        };
+
+        document.body.appendChild(script);
+
+        setTimeout(() => {
+          if (window[cbName]) {
+            try { delete window[cbName]; } catch(e) { window[cbName] = undefined; }
+            script.remove();
+            resolve(false);
+          }
+        }, 10000);
+      });
     }
 
     async function makePdf(){
@@ -739,7 +643,7 @@
       const contactName  = $('contactName').value?.trim() || '-';
       const contactEmail = $('contactEmail').value?.trim() || '-';
 
-      // ✅ 1) 다운로드 시 고객정보/선택항목 저장 (구글시트)
+      // ✅ 1) 저장 (JSONP)
       const payload = {
         savedAt: new Date().toISOString(),
         quoteNo,
@@ -761,24 +665,13 @@
       };
 
       const saved = await saveToGoogleSheet(payload);
-      if (!saved) {
-        toast('시트 저장에 실패했지만 PDF는 다운로드합니다.');
-      }
+      if (!saved) toast('시트 저장이 확인되지 않았지만 PDF는 다운로드합니다.');
 
-      // ✅ 2) PDF 렌더링(캡처)
+      // ✅ 2) PDF 캡처 생성
       const pdfEl = document.getElementById('pdfRender');
-      pdfEl.innerHTML = buildPdfHtml({
-        quoteNo, quoteDate, validUntil,
-        companyName, contactName, contactEmail,
-        rows, total, aiTier
-      });
+      pdfEl.innerHTML = buildPdfHtml({ quoteNo, quoteDate, validUntil, companyName, contactName, contactEmail, rows, total, aiTier });
 
-      const canvas = await html2canvas(pdfEl, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#ffffff',
-      });
-
+      const canvas = await html2canvas(pdfEl, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
       const imgData = canvas.toDataURL('image/png');
 
       const { jsPDF } = window.jspdf;
@@ -820,23 +713,19 @@
         }
       }
 
-      // ✅ 3) PDF 하단 텍스트 크게 + Arial 요청: jsPDF 기본은 Arial이 없어 Helvetica(유사) 사용
+      // ✅ PDF 하단 문구 크게 (Arial 요청: 기본폰트 중 helvetica 사용)
       const footerText = "Linkedin Korea Partner_HR Point";
       const totalPages = doc.getNumberOfPages();
-
-      // Arial 대신 helvetica (가장 유사한 기본 폰트)
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(16); // 더 크게
+      doc.setFontSize(16);
 
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
         doc.text(footerText, pageWidth / 2, pageHeight - 14, { align: 'center' });
       }
 
-      // ✅ 4) 파일명에 다운로드 날짜/시간 추가
       const base = `[Linkedin] 견적서_(Korea Partner_HR Point)`;
-      const filename = `${base}_${downloadStamp()}.pdf`;
-      doc.save(filename);
+      doc.save(`${base}_${downloadStamp()}.pdf`);
     }
 
     const copyLink = async () => {
@@ -914,5 +803,19 @@
     ensureQuoteNoOnce();
     recalc();
   </script>
+
+  <!--
+    ✅ 중요: Google Apps Script (웹앱) 쪽 doGet(e)가 JSONP(callback)를 지원해야 합니다.
+    아래 Apps Script를 사용하세요(요약):
+
+    function doGet(e){
+      const p = e.parameter;
+      // sheet append...
+      const cb = p.callback;
+      return ContentService
+        .createTextOutput(cb ? `${cb}(${JSON.stringify({ok:true})})` : JSON.stringify({ok:true}))
+        .setMimeType(cb ? ContentService.MimeType.JAVASCRIPT : ContentService.MimeType.JSON);
+    }
+  -->
 </body>
 </html>

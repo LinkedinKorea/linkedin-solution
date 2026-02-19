@@ -66,7 +66,6 @@
 
     .muted{color:var(--muted);font-size:12px;line-height:1.55}
 
-    /* ✅ 설명란: 의도한 줄바꿈 그대로 */
     .descBox{
       margin-top:10px;
       background:var(--soft);
@@ -76,7 +75,7 @@
       color:#cbd5e1;
       font-size:12px;
       line-height:1.55;
-      white-space: pre-line;  /* ✅ 줄바꿈 유지 */
+      white-space: pre-line;
     }
 
     .solTitle{
@@ -244,7 +243,6 @@
           </div>
 
           <div class="rows">
-
             <div class="row">
               <div>
                 <div class="solTitle">Recruiter (인재검색)</div>
@@ -444,16 +442,12 @@
 
   <script>
     const $ = (id) => document.getElementById(id) || {
-      value: '',
-      textContent: '',
-      innerHTML: '',
-      style: {},
-      addEventListener: () => {},
+      value: '', textContent: '', innerHTML: '', style: {}, addEventListener: () => {},
     };
 
+    // ✅ (중요) jsPDF 폰트가 "진짜 등록됐는지" 확인해서 없으면 반드시 addFont
     const KOREAN_FONT_URL =
       "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/notosanskr/NotoSansKR-Regular.ttf";
-
     let __koreanFontB64 = null;
     let __koreanFontLoading = null;
 
@@ -467,14 +461,17 @@
       return btoa(binary);
     }
 
+    function __hasFont(doc, family, style="normal") {
+      const list = doc.getFontList ? doc.getFontList() : {};
+      return !!(list && list[family] && list[family].includes(style));
+    }
+
     async function ensureKoreanFont(doc) {
-      try { doc.setFont("NotoSansKR"); return; } catch (e) {}
-      if (__koreanFontB64) {
-        doc.addFileToVFS("NotoSansKR-Regular.ttf", __koreanFontB64);
-        doc.addFont("NotoSansKR-Regular.ttf", "NotoSansKR", "normal");
-        doc.setFont("NotoSansKR");
+      if (__hasFont(doc, "NotoSansKR", "normal")) {
+        doc.setFont("NotoSansKR", "normal");
         return;
       }
+
       if (!__koreanFontLoading) {
         __koreanFontLoading = fetch(KOREAN_FONT_URL, { mode: "cors" })
           .then((r) => {
@@ -483,11 +480,24 @@
           })
           .then((buf) => (__koreanFontB64 = __arrayBufferToBase64(buf)));
       }
-      const b64 = await __koreanFontLoading;
+
+      const b64 = __koreanFontB64 || await __koreanFontLoading;
+
+      // VFS 등록 → 폰트 등록 → 적용
       doc.addFileToVFS("NotoSansKR-Regular.ttf", b64);
       doc.addFont("NotoSansKR-Regular.ttf", "NotoSansKR", "normal");
-      doc.setFont("NotoSansKR");
+      doc.setFont("NotoSansKR", "normal");
     }
+
+    // (선택) 페이지 로드 시 폰트 미리 받아두면 PDF 생성 시 더 안정적
+    (function preloadFont(){
+      if (!__koreanFontLoading) {
+        __koreanFontLoading = fetch(KOREAN_FONT_URL, { mode: "cors" })
+          .then((r) => r.arrayBuffer())
+          .then((buf) => (__koreanFontB64 = __arrayBufferToBase64(buf)))
+          .catch(()=>null);
+      }
+    })();
 
     const PRICES = {
       recruiter: 11350,
@@ -495,9 +505,9 @@
       lti: 12500,
       ai: {
         none: { price: 0, search: 0, app: 0, label: '선택 안 함' },
-        t1: { price: 3170, search: 200,  app: 3500,  label: 'Tier 1' },
-        t2: { price: 6910, search: 800,  app: 9000,  label: 'Tier 2' },
-        t3: { price: 10365,search: 1500, app: 25000, label: 'Tier 3' },
+        t1: { price: 3170,  search: 200,  app: 3500,  label: 'Tier 1' },
+        t2: { price: 6910,  search: 800,  app: 9000,  label: 'Tier 2' },
+        t3: { price: 10365, search: 1500, app: 25000, label: 'Tier 3' },
       }
     };
 
@@ -607,13 +617,6 @@
 
       const rows = buildRows({ aiTier, qtyRecruiter, qtyJob, qtyLTI, lifeInclude, amtRecruiter, amtAI, amtJob, amtLTI, total });
 
-      const minNotice = document.getElementById('minNotice');
-      if (total > 0 && total < 10000) {
-        if (minNotice) minNotice.style.display = 'block';
-      } else {
-        if (minNotice) minNotice.style.display = 'none';
-      }
-
       $('items').textContent = rows.length ? `${rows.length}개 항목` : '-';
 
       const tb = $('tbody');
@@ -642,8 +645,8 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ unit: 'pt', format: 'a4' });
 
+      // ✅ 폰트 “실제 등록”을 보장하고, 모든 출력 전에 적용
       await ensureKoreanFont(doc);
-      doc.setFont("NotoSansKR");
 
       const marginX = 40;
       let y = 44;
@@ -680,8 +683,9 @@
         startY: y,
         head: [[ '항목', '단가(USD)', '수량', '금액(USD)' ]],
         body,
-        styles: { font: 'NotoSansKR', fontSize: 9, cellPadding: 6 },
-        headStyles: { fillColor: [11, 18, 32] },
+        // ✅ autoTable도 폰트 강제 (핵심)
+        styles: { font: 'NotoSansKR', fontStyle: 'normal', fontSize: 9, cellPadding: 6 },
+        headStyles: { fillColor: [11, 18, 32], font: 'NotoSansKR', fontStyle: 'normal' },
         columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' } },
         margin: { left: marginX, right: marginX },
       });

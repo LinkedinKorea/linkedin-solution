@@ -27,7 +27,7 @@
       background:linear-gradient(180deg,#070a0f,#0b0f14 40%);
       color:var(--text);
     }
-    .wrap{max-width:1120px;margin:0 auto;padding:26px 16px 110px}
+    .wrap{max-width:1120px;margin:0 auto;padding:26px 16px 120px}
     .top{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap}
     h1{margin:0;font-size:22px;letter-spacing:-.2px}
     .sub{margin:8px 0 0;color:var(--muted);line-height:1.55;font-size:13px}
@@ -55,7 +55,6 @@
     .meta{font-size:11px;color:var(--muted)}
     .bd{padding:14px 16px}
 
-    /* 섹션 배경 차등 */
     .sectionBox{
       background:rgba(11,18,32,.45);
       border:1px solid rgba(31,41,55,.9);
@@ -81,11 +80,7 @@
     input[type="date"]{font-family:inherit;font-size:13px;color:var(--text)}
     input:focus, select:focus{border-color:rgba(96,165,250,.6);box-shadow:0 0 0 3px rgba(96,165,250,.14)}
     input[readonly]{opacity:.92}
-    .noPick{
-      pointer-events:none;
-      user-select:none;
-      opacity:.95;
-    }
+    .noPick{pointer-events:none; user-select:none; opacity:.95;}
 
     .rows{display:grid;gap:14px}
     .row{display:grid;grid-template-columns:1fr 160px 160px;gap:12px;align-items:end;padding:10px 0}
@@ -94,15 +89,22 @@
     .hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.35;min-height:16px}
     .desc{color:var(--muted);font-size:12px;line-height:1.5;margin-top:4px;white-space:pre-line}
 
-    /* 제품 구분선 */
     .productRow{border-top:1px solid rgba(31,41,55,.85)}
     .productRow:first-child{border-top:none}
 
-    table{width:100%;border-collapse:separate;border-spacing:0;min-width:620px}
-    th, td{padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+    /* ✅ 가로 스크롤바 제거: 테이블이 카드 안에서 줄바꿈 되도록 */
+    table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
+    th, td{
+      padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:top;
+      word-break:break-word; overflow-wrap:anywhere;
+    }
     th{font-size:12px;color:#cbd5e1;text-align:left;background:rgba(11,18,32,.35)}
     td{font-size:13px}
     .right{text-align:right}
+    @media (max-width:420px){
+      th, td{padding:8px 8px;font-size:12px}
+      th{font-size:11px}
+    }
 
     .kpis{display:grid;gap:10px}
     .kpi{padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(11,18,32,.55)}
@@ -121,7 +123,6 @@
       color:#d1fae5
     }
 
-    /* AI 박스 연결 강조 */
     .aiBox{
       border:1px dashed rgba(96,165,250,.35);
       background:rgba(96,165,250,.06);
@@ -129,29 +130,27 @@
       padding:12px;
     }
 
-    .tableWrap{
-      overflow-x:auto;
-      -webkit-overflow-scrolling:touch;
-      border-radius:14px;
-      border:1px solid rgba(31,41,55,.55);
-    }
-
     .sticky{
       position:fixed;left:0;right:0;bottom:0;padding:14px 14px;
       background:rgba(8,12,18,.72);backdrop-filter:blur(10px);
       border-top:1px solid var(--line)
     }
-    .sticky .inner{max-width:1120px;margin:0 auto;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .btnsLeft{display:flex;gap:10px;flex-wrap:wrap}
-    .btnsRight{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-    .btnsRight{margin-left:auto}
-    .btnGap{margin-left:8px}
+    .sticky .inner{
+      max-width:1120px;margin:0 auto;
+      display:flex;gap:10px;align-items:center;justify-content:space-between;
+    }
+    .stickyLeft{flex:0 0 auto;display:flex;gap:10px;align-items:center}
+    .stickyCenter{flex:1 1 auto;text-align:center;color:var(--muted);font-size:11px;line-height:1.3;padding:0 8px}
+    .stickyRight{flex:0 0 auto;display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+    @media (max-width:720px){
+      .sticky .inner{flex-wrap:wrap}
+      .stickyCenter{order:3;flex:1 1 100%;text-align:left}
+    }
 
     button{
       appearance:none;border:1px solid var(--line);background:var(--soft);color:var(--text);
       padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:800;font-size:13px
     }
-    /* 다운로드 버튼 강조 */
     button.primary{
       border-color:rgba(37,99,235,.55);
       background:linear-gradient(180deg,var(--btn),var(--btn2));
@@ -159,21 +158,62 @@
     }
     button:hover{filter:brightness(1.07)}
 
-    .toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:rgba(17,24,39,.92);border:1px solid var(--line);padding:10px 12px;border-radius:12px;box-shadow:0 12px 24px rgba(0,0,0,.35);font-size:13px;display:none;z-index:9999}
+    .toast{
+      position:fixed;left:50%;bottom:80px;transform:translateX(-50%);
+      background:rgba(17,24,39,.92);border:1px solid var(--line);
+      padding:10px 12px;border-radius:12px;box-shadow:0 12px 24px rgba(0,0,0,.35);
+      font-size:13px;display:none;z-index:9999
+    }
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
-
     .muted{color:var(--muted)}
+    .footNote{margin-top:10px;font-size:11px;color:var(--muted);line-height:1.45;}
 
-    .footNote{
-      margin-top:10px;
+    /* ✅ PDF 캡처 전용(화면에는 안 보임) */
+    #pdfCaptureRoot{
+      position:fixed;
+      left:-99999px; top:0;
+      width:794px; /* A4 폭(대략) 기준 캡처 안정화 */
+      background:#ffffff;
+      color:#111827;
+      padding:24px;
+      border-radius:0;
+      z-index:-1;
+    }
+    #pdfCaptureRoot *{box-sizing:border-box}
+    #pdfCaptureRoot .h1{font-size:20px;font-weight:900;letter-spacing:-.2px;margin:0 0 8px}
+    #pdfCaptureRoot .metaLine{font-size:11px;color:#374151;line-height:1.5;margin-bottom:10px}
+    #pdfCaptureRoot .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+    #pdfCaptureRoot .box{border:1px solid #e5e7eb;border-radius:10px;padding:10px}
+    #pdfCaptureRoot .boxTitle{font-size:12px;font-weight:800;margin:0 0 6px;color:#111827}
+    #pdfCaptureRoot .kv{font-size:11px;color:#111827;line-height:1.6}
+    #pdfCaptureRoot table{width:100%;border-collapse:collapse;table-layout:fixed}
+    #pdfCaptureRoot th, #pdfCaptureRoot td{
+      border:1px solid #e5e7eb;
+      padding:8px;
       font-size:11px;
-      color:var(--muted);
-      line-height:1.45;
+      word-break:break-word; overflow-wrap:anywhere;
+    }
+    #pdfCaptureRoot th{background:#f3f4f6;text-align:left}
+    #pdfCaptureRoot .right{text-align:right}
+    #pdfCaptureRoot .totalBig{font-size:16px;font-weight:900;margin-top:10px;text-align:right}
+    #pdfCaptureRoot .vatSmall{font-size:10px;color:#6b7280;text-align:right;margin-top:2px}
+    #pdfCaptureRoot .partner{
+      margin-top:16px;
+      text-align:center;
+      font-size:18px;
+      font-weight:900;
+      color:#111827;
+    }
+    #pdfCaptureRoot .bottomNote{
+      margin-top:6px;
+      text-align:center;
+      font-size:10px;
+      color:#6b7280;
     }
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.31/dist/jspdf.plugin.autotable.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -374,7 +414,7 @@
       <!-- RIGHT -->
       <div class="card">
         <div class="hd"><b>견적서 자동산출요약</b><span class="meta">USD 기준</span></div>
-        <div class="bd">
+        <div class="bd" id="summaryBox">
           <div class="kpis">
             <div class="kpi">
               <div class="t">총 합계</div>
@@ -390,25 +430,24 @@
 
           <div style="height:12px"></div>
 
-          <div class="tableWrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>항목</th>
-                  <th class="right">단가(USD)</th>
-                  <th class="right">수량</th>
-                  <th class="right">금액(USD)</th>
-                </tr>
-              </thead>
-              <tbody id="tbody"></tbody>
-              <tfoot>
-                <tr>
-                  <th colspan="3" class="right">합계</th>
-                  <th class="right" id="total2">-</th>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
+          <!-- ✅ 가로 스크롤 랩 삭제 -->
+          <table>
+            <thead>
+              <tr>
+                <th style="width:42%">항목</th>
+                <th class="right" style="width:18%">단가(USD)</th>
+                <th class="right" style="width:12%">수량</th>
+                <th class="right" style="width:28%">금액(USD)</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+            <tfoot>
+              <tr>
+                <th colspan="3" class="right">합계</th>
+                <th class="right" id="total2">-</th>
+              </tr>
+            </tfoot>
+          </table>
 
           <div id="minNotice" style="margin-top:10px;font-size:12px;font-weight:800;color:var(--warn);display:none;line-height:1.5">
             기업용 솔루션은 최소 합계금액이 $10,000 부터 계약이 가능합니다.<br/>
@@ -429,14 +468,19 @@
     <div class="toast" id="toast">완료</div>
   </div>
 
+  <!-- ✅ PDF 캡처용 루트(오프스크린) -->
+  <div id="pdfCaptureRoot" aria-hidden="true"></div>
+
   <div class="sticky">
     <div class="inner">
-      <div class="meta">맨 하단에 견적서를 pdf로 다운받을수 있습니다. 본 견적서는 단순 참고용입니다.</div>
-      <div class="btnsLeft">
+      <div class="stickyLeft">
         <button id="btnReset">초기화</button>
       </div>
-      <div class="btnsRight">
-        <button id="btnCopyLink" class="btnGap">견적서 결과 링크복사</button>
+      <div class="stickyCenter">
+        견적서는 PDF로 다운받으시기 바랍니다. 본 견적서는 단순 참고용입니다.
+      </div>
+      <div class="stickyRight">
+        <button id="btnCopyLink">견적서 결과 링크복사</button>
         <button class="primary" id="btnPdf">견적서 다운로드(PDF)</button>
       </div>
     </div>
@@ -445,40 +489,6 @@
   <script>
     // ✅ 새 WebApp URL
     const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyGUnl2eAXU3Vh9_Y9ZPtdXfVZu_z6OwKczEMzU1EOQibLoroweRa3-X9ksVIPXMhjmSw/exec";
-
-    // ===== PDF 폰트(한글 깨짐 방지) =====
-    const KOREAN_FONT_URL = "https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-kr/files/noto-sans-kr-korean-400-normal.ttf";
-    let __koreanFontB64 = null;
-    let __koreanFontLoading = null;
-
-    function __arrayBufferToBase64(buffer) {
-      const bytes = new Uint8Array(buffer);
-      let binary = "";
-      const chunk = 0x8000;
-      for (let i = 0; i < bytes.length; i += chunk) {
-        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
-      }
-      return btoa(binary);
-    }
-
-    async function ensureKoreanFont(doc) {
-      try { doc.setFont("NotoSansKR"); return; } catch (e) {}
-      if (__koreanFontB64) {
-        doc.addFileToVFS("NotoSansKR-Regular.ttf", __koreanFontB64);
-        doc.addFont("NotoSansKR-Regular.ttf", "NotoSansKR", "normal");
-        doc.setFont("NotoSansKR");
-        return;
-      }
-      if (!__koreanFontLoading) {
-        __koreanFontLoading = fetch(KOREAN_FONT_URL, { cache: "force-cache" })
-          .then(r => { if (!r.ok) throw new Error("Font download failed"); return r.arrayBuffer(); })
-          .then(buf => (__koreanFontB64 = __arrayBufferToBase64(buf)));
-      }
-      const b64 = await __koreanFontLoading;
-      doc.addFileToVFS("NotoSansKR-Regular.ttf", b64);
-      doc.addFont("NotoSansKR-Regular.ttf", "NotoSansKR", "normal");
-      doc.setFont("NotoSansKR");
-    }
 
     const $ = (id) => document.getElementById(id);
 
@@ -529,7 +539,6 @@
       return d.toISOString().slice(0,10);
     };
 
-    // === "상품내용 변경없을시 동일브라우저 견적번호 고정" ===
     function getProductSignature(){
       const sigObj = {
         qtyRecruiter: $('qtyRecruiter')?.value || '0',
@@ -548,32 +557,31 @@
 
       if (lastSig === sig && lastNo) {
         $('quoteNo').value = lastNo;
-        return;
+        return lastNo;
       }
       const newNo = genQuoteNo();
       $('quoteNo').value = newNo;
       localStorage.setItem('lk_quote_sig', sig);
       localStorage.setItem('lk_quote_no', newNo);
+      // ✅ 새 견적이면 "시트 기록 여부"도 초기화
+      return newNo;
     }
 
     function setDefaultQuoteFields(){
       const today = new Date().toISOString().slice(0,10);
 
-      // 견적일: 오늘 날짜 자동 + 변경불가
       if ($('quoteDate')) {
         $('quoteDate').value = today;
         $('quoteDate').setAttribute('readonly','readonly');
         $('quoteDate').classList.add('noPick');
       }
 
-      // 유효기간: 20일 + 변경불가
       if ($('validUntil')) {
         $('validUntil').value = addDaysISO(today, 20);
         $('validUntil').setAttribute('readonly','readonly');
         $('validUntil').classList.add('noPick');
       }
 
-      // 견적번호: 상품내용 기준으로 브라우저 고정
       if ($('quoteNo')) {
         $('quoteNo').setAttribute('readonly','readonly');
         syncQuoteNoBySignature();
@@ -591,8 +599,7 @@
     }
 
     function recalc(){
-      // 상품 변경 여부에 따라 견적번호 유지/재생성
-      syncQuoteNoBySignature();
+      const quoteNo = syncQuoteNoBySignature();
 
       const aiTier = $('aiTier')?.value || 'none';
       const qtyRecruiter = toNum($('qtyRecruiter')?.value);
@@ -612,7 +619,6 @@
       $('amtLTI').value = money(amtLTI);
       $('amtLife').value = (lifeInclude === 'yes') ? '문의' : '-';
 
-      // AI 표시
       if (aiTier === 'none') {
         $('aiCapacity').value = '선택 안 함';
         $('aiApplicant').value = '선택 안 함';
@@ -626,14 +632,14 @@
 
       const rows = buildRows({ aiTier, qtyRecruiter, qtyJob, qtyLTI, lifeInclude, amtRecruiter, amtAI, amtJob, amtLTI, total });
 
-      // ✅ 선택 항목: "제품이름" 표시
+      // ✅ 선택 항목: 제품명 나열
       if (!rows.length) {
         $('items').textContent = '-';
       } else {
         const names = rows.map(r => {
           if (r.unit == null) return r.name;
-          if (r.qty == null) return r.name;
-          return `${r.name}${(r.qty && r.qty !== 1 && r.name !== 'AI Hiring Assistant') ? ` x${r.qty}` : (r.name === 'AI Hiring Assistant (Tier 1)' || r.name === 'AI Hiring Assistant (Tier 2)' || r.name === 'AI Hiring Assistant (Tier 3)') ? '' : (r.name === 'AI Hiring Assistant' ? '' : '')}`;
+          if (r.name.startsWith('AI Hiring Assistant')) return r.name;
+          return r.qty > 1 ? `${r.name} x${r.qty}` : r.name;
         });
         $('items').textContent = names.join(', ');
       }
@@ -649,11 +655,26 @@
         return `<tr><td>${r.name}</td><td class="right">${unit}</td><td class="right">${qty}</td><td class="right">${amt}</td></tr>`;
       }).join('') : `<tr><td colspan="4" class="muted">선택된 항목이 없습니다.</td></tr>`;
 
-      return { total, rows, aiTier };
+      return { total, rows, aiTier, quoteNo };
     }
 
-    // ===== 시트 저장(POST, 웨일/모바일 안정) =====
-    async function saveToSheet(payload){
+    // ===== 시트 저장(중복 1회 방지) =====
+    function getSheetLogKey(quoteNo){
+      return `lk_sheet_logged_${quoteNo}`;
+    }
+
+    async function saveToSheetOnce(payload){
+      const quoteNo = payload.quoteNo || '';
+      if (!quoteNo) return;
+
+      const key = getSheetLogKey(quoteNo);
+      if (localStorage.getItem(key)) {
+        return; // ✅ 이미 기록된 견적서
+      }
+
+      // ✅ "저장 시도" 즉시 마킹(빠르게 여러번 눌러도 1회로)
+      localStorage.setItem(key, String(Date.now()));
+
       try {
         const url = GAS_WEBAPP_URL + "?_ts=" + Date.now();
         await fetch(url, {
@@ -665,7 +686,10 @@
           cache: 'no-store',
           redirect: 'follow'
         });
-      } catch(e) {}
+      } catch(e) {
+        // 네트워크 실패 시 재시도 가능하게 마킹 해제(원하면 유지해도 됨)
+        localStorage.removeItem(key);
+      }
     }
 
     function buildSheetPayload(total, rows, aiTier){
@@ -686,98 +710,153 @@
       };
     }
 
-    // ===== PDF 생성 =====
-    async function makePdf(){
-      setDefaultQuoteFields();
-      const { total, rows } = recalc();
-      if (!rows.length) { toast('선택된 항목이 없습니다.'); return; }
+    // ===== 파일명: Linkedin Korea Partner_YYYYMMDD_HHMM =====
+    function fileStamp(){
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,'0');
+      const day = String(d.getDate()).padStart(2,'0');
+      const hh = String(d.getHours()).padStart(2,'0');
+      const mm = String(d.getMinutes()).padStart(2,'0');
+      return `${y}${m}${day}_${hh}${mm}`;
+    }
 
+    // ===== ✅ PDF: html2canvas 캡처 방식(한글 깨짐 방지) =====
+    function renderCaptureHtml({ total, rows, quoteNo }){
       const company = $('company').value || '';
       const contact = $('contact').value || '';
       const email = $('email').value || '';
-      const quoteNo = $('quoteNo').value || genQuoteNo();
       const quoteDate = $('quoteDate').value || new Date().toISOString().slice(0,10);
       const validUntil = $('validUntil').value || addDaysISO(quoteDate, 20);
 
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ unit:'pt', format:'a4' });
-
-      await ensureKoreanFont(doc);
-      doc.setFont('NotoSansKR');
-
-      const marginX = 44;
-      let y = 60;
-
-      doc.setFontSize(22);
-      doc.text('Linkedin Solution 견적서', marginX, y);
-      y += 22;
-
-      doc.setFontSize(10);
-      doc.text(`견적번호: ${quoteNo}`, marginX, y);
-      doc.text(`견적일: ${quoteDate}`, 360, y);
-      y += 14;
-      doc.text(`유효기간: ${validUntil} (20일)`, marginX, y);
-      y += 14;
-      doc.text('VAT: None', marginX, y);
-      y += 18;
-
-      doc.text(`회사명: ${company}`, marginX, y);
-      y += 14;
-      doc.text(`담당자: ${contact}`, marginX, y);
-      doc.text(`이메일: ${email}`, 360, y);
-      y += 18;
-
-      const body = rows.map(r => {
+      const bodyRows = rows.map(r => {
         const unit = (r.unit == null) ? '문의' : money(r.unit);
         const qty = (r.qty == null) ? '-' : String(r.qty);
         const amt = (r.amount == null) ? '문의' : money(r.amount);
-        return [r.name, unit, qty, amt];
-      });
+        return `<tr>
+          <td>${r.name}</td>
+          <td class="right">${unit}</td>
+          <td class="right">${qty}</td>
+          <td class="right">${amt}</td>
+        </tr>`;
+      }).join('');
 
-      doc.autoTable({
-        startY: y,
-        head: [[ 'Item', 'Unit Price (USD)', 'Qty', 'Amount (USD)' ]],
-        body,
-        styles: { font: 'NotoSansKR', fontSize: 9, cellPadding: 6 },
-        headStyles: { fillColor: [11, 18, 32] },
-        columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' } },
-        margin: { left: marginX, right: marginX },
-      });
+      return `
+        <div class="h1">Linkedin Solution 견적서</div>
+        <div class="metaLine">
+          견적번호: <b>${quoteNo}</b> &nbsp; | &nbsp; 견적일: <b>${quoteDate}</b><br/>
+          유효기간: <b>${validUntil}</b> (20일) &nbsp; | &nbsp; VAT: <b>None</b>
+        </div>
 
-      const endY = doc.lastAutoTable.finalY + 18;
+        <div class="grid2">
+          <div class="box">
+            <div class="boxTitle">고객정보</div>
+            <div class="kv">회사명: <b>${company || '-'}</b><br/>담당자: <b>${contact || '-'}</b></div>
+          </div>
+          <div class="box">
+            <div class="boxTitle">연락처</div>
+            <div class="kv">이메일: <b>${email || '-'}</b><br/>문의: <b>02-6405-4446</b></div>
+          </div>
+        </div>
 
-      // ✅ 총합계 크게 + VAT 작게
-      doc.setFontSize(14);
-      doc.text(`Total (USD): ${money(total)}`, 360, endY);
-      doc.setFontSize(9);
-      doc.text('※ 부가세 없음', 360, endY + 12);
+        <div class="box">
+          <div class="boxTitle">견적 내역</div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:45%">Item</th>
+                <th style="width:18%" class="right">Unit (USD)</th>
+                <th style="width:10%" class="right">Qty</th>
+                <th style="width:27%" class="right">Amount (USD)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${bodyRows || `<tr><td colspan="4">선택된 항목이 없습니다.</td></tr>`}
+            </tbody>
+          </table>
 
-      // 하단 중앙 Partner 문구 (동일 폰트 + 큰 글씨)
-      const pageW = doc.internal.pageSize.getWidth();
-      const pageH = doc.internal.pageSize.getHeight();
-      doc.setFontSize(18);
-      doc.text('Linkedin Korea Partner', pageW/2, pageH - 44, { align: 'center' });
+          <div class="totalBig">Total (USD): ${money(total)}</div>
+          <div class="vatSmall">※ 부가세 없음</div>
+        </div>
 
-      doc.setFontSize(9);
-      doc.text('본 견적서는 단순 참고용입니다.', pageW/2, pageH - 28, { align: 'center' });
-
-      doc.save(`LinkedIn_Quotation_${quoteNo}.pdf`);
+        <div class="partner">Linkedin Korea Partner</div>
+        <div class="bottomNote">견적서는 PDF로 다운받으시기 바랍니다. 본 견적서는 단순 참고용입니다.</div>
+      `;
     }
 
-    async function onDownload(){
+    async function makePdfByCapture(){
+      setDefaultQuoteFields();
+      const { total, rows, aiTier, quoteNo } = recalc();
+      if (!rows.length) { toast('선택된 항목이 없습니다.'); return; }
+
+      // 캡처 HTML 주입
+      const root = $('pdfCaptureRoot');
+      root.innerHTML = renderCaptureHtml({ total, rows, quoteNo });
+
+      // 캡처
+      const canvas = await html2canvas(root, {
+        scale: 2,           // 선명도
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        allowTaint: true
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ unit:'pt', format:'a4' });
+
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+
+      // 캔버스 크기 -> PDF 비율 맞추기
+      const imgW = pageW;
+      const imgH = canvas.height * (imgW / canvas.width);
+
+      let y = 0;
+      let remaining = imgH;
+
+      // 첫 페이지
+      pdf.addImage(imgData, 'PNG', 0, 0, imgW, imgH, undefined, 'FAST');
+      remaining -= pageH;
+
+      // 멀티페이지(세로가 길면)
+      while (remaining > 0) {
+        pdf.addPage();
+        y = - (imgH - remaining);
+        pdf.addImage(imgData, 'PNG', 0, y, imgW, imgH, undefined, 'FAST');
+        remaining -= pageH;
+      }
+
+      const filename = `Linkedin Korea Partner_${fileStamp()}.pdf`;
+      pdf.save(filename);
+    }
+
+    // ===== 공통: 버튼 클릭 시 "시트 저장(1회)" =====
+    async function logOnceForCurrentQuote(){
       setDefaultQuoteFields();
       const { total, rows, aiTier } = recalc();
-      await saveToSheet(buildSheetPayload(total, rows, aiTier));
-      await makePdf();
+      if (!rows.length) return false;
+      await saveToSheetOnce(buildSheetPayload(total, rows, aiTier));
+      return true;
     }
 
-    async function copyLink(){
-      // "견적서 결과 링크복사" = 현재 입력/선택 상태를 그대로 복사
+    async function onDownloadPdf(){
+      const ok = await logOnceForCurrentQuote();
+      if (!ok) { toast('선택된 항목이 없습니다.'); return; }
+      await makePdfByCapture();
+    }
+
+    async function onCopyLink(){
+      const ok = await logOnceForCurrentQuote(); // ✅ 링크복사도 시트기록(1회)
+      if (!ok) { toast('선택된 항목이 없습니다.'); return; }
+
       const p = new URLSearchParams({
         company: $('company').value || '',
         contact: $('contact').value || '',
         email: $('email').value || '',
         quoteNo: $('quoteNo').value || '',
+        // 견적일은 항상 오늘 고정이므로 굳이 포함해도 무방하지만 그대로 둠
         quoteDate: $('quoteDate').value || '',
         qtyRecruiter: $('qtyRecruiter').value || '0',
         qtyJob: $('qtyJob').value || '0',
@@ -785,6 +864,7 @@
         lifeInclude: $('lifeInclude').value || 'no',
         qtyLTI: $('qtyLTI').value || '0'
       });
+
       const url = `${location.origin}${location.pathname}?${p.toString()}`;
       try { await navigator.clipboard.writeText(url); toast('견적서 결과 링크가 복사되었습니다.'); }
       catch(e){ toast('복사 실패'); }
@@ -796,14 +876,14 @@
       set('company','company');
       set('contact','contact');
       set('email','email');
-      // quoteNo는 "상품내용 고정" 규칙이 있으니 링크로 들어와도 우선 세팅 후 동기화
-      set('quoteNo','quoteNo');
-      // 견적일은 항상 오늘로 고정이므로 링크 값은 무시 (요구사항)
       set('qtyRecruiter','qtyRecruiter');
       set('qtyJob','qtyJob');
       set('aiTier','aiTier');
       set('lifeInclude','lifeInclude');
       set('qtyLTI','qtyLTI');
+      // quoteNo는 상품시그니처로 고정이므로 링크 값은 무시해도 되지만,
+      // 사용자가 공유한 링크 그대로 보이길 원할 수 있어 일단 세팅 후 sync로 정리
+      if (p.has('quoteNo') && $('quoteNo')) $('quoteNo').value = p.get('quoteNo');
     }
 
     function resetAll(){
@@ -818,7 +898,7 @@
 
       history.replaceState({}, '', location.pathname);
 
-      // reset 시에는 새로운 시그니처가 되므로 quoteNo 재생성
+      // reset 시에는 새로운 시그니처가 되므로 quoteNo 재생성 + 시트로그도 새로
       localStorage.removeItem('lk_quote_sig');
       localStorage.removeItem('lk_quote_no');
 
@@ -827,11 +907,10 @@
       toast('초기화 완료');
     }
 
-    document.getElementById('btnPdf')?.addEventListener('click', async (e)=>{ e.preventDefault(); await onDownload(); });
-    document.getElementById('btnCopyLink')?.addEventListener('click', async (e)=>{ e.preventDefault(); await copyLink(); });
+    document.getElementById('btnPdf')?.addEventListener('click', async (e)=>{ e.preventDefault(); await onDownloadPdf(); });
+    document.getElementById('btnCopyLink')?.addEventListener('click', async (e)=>{ e.preventDefault(); await onCopyLink(); });
     document.getElementById('btnReset')?.addEventListener('click', (e)=>{ e.preventDefault(); resetAll(); });
 
-    // 견적일/유효기간/견적번호는 변경불가이므로 이벤트에서 제외
     ['company','contact','email','qtyRecruiter','qtyJob','aiTier','lifeInclude','qtyLTI'].forEach(id=>{
       const el = document.getElementById(id);
       if (!el) return;

@@ -159,12 +159,10 @@
     }
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
     .muted{color:var(--muted)}
-    .footNote{margin-top:10px;font-size:11px;color:var(--muted);line-height:1.45;}
 
     /* ✅ PDF 캡처 전용(화면에는 안 보임)
-       - A4 여백 30mm: 좌우상하 모두 30mm
-       - A4: 794px 폭 기준에서 30mm≈113px (96dpi 가정)
-         실제 출력은 jsPDF A4에 맞춰 스케일링되므로 "여백 느낌"을 안정적으로 주기 위해 내부 padding으로 구현
+       - A4 여백 30mm: 내부 padding으로 구현 (30mm≈113px @96dpi 느낌)
+       - PDF 폰트: 맑은 고딕 계열 우선
     */
     #pdfCaptureRoot{
       position:fixed;
@@ -172,13 +170,13 @@
       width:794px;
       background:#ffffff;
       color:#000;
-      padding:113px; /* 30mm 느낌 */
+      padding:113px;
       z-index:-1;
-      font-family: "Malgun Gothic","맑은 고딕","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+      font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
     }
     #pdfCaptureRoot *{
       box-sizing:border-box;
-      font-family: "Malgun Gothic","맑은 고딕","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+      font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
     }
   </style>
 
@@ -415,17 +413,11 @@
             </tfoot>
           </table>
 
-          <div id="minNotice" style="margin-top:10px;font-size:12px;font-weight:800;color:var(--warn);display:none;line-height:1.5">
-            기업용 솔루션은 최소 합계금액이 $10,000 부터 계약이 가능합니다.<br/>
-            구체적인 문의는 Linkedin Korea Partner로 연락주세요.
-          </div>
-
           <div class="callout green" style="margin-top:12px">
             <b>기업용 솔루션 문의</b><br/>
             Linkedin Korea Partner<br/>
             02-6405-4446<br/>
             help@hrpoint.co.kr
-            <div class="footNote">할인내용 : 그룹사 가격, 다년계약, 볼륨할인 등 문의</div>
           </div>
         </div>
       </div>
@@ -452,9 +444,7 @@
   </div>
 
   <script>
-    // ✅ 새 WebApp URL
     const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyGUnl2eAXU3Vh9_Y9ZPtdXfVZu_z6OwKczEMzU1EOQibLoroweRa3-X9ksVIPXMhjmSw/exec";
-
     const $ = (id) => document.getElementById(id);
 
     const toast = (msg='완료') => {
@@ -504,7 +494,6 @@
       return d.toISOString().slice(0,10);
     };
 
-    // ✅ 필수 입력 체크 (회사명/담당자/이메일)
     function validateRequired(){
       const company = ($('company')?.value || '').trim();
       const contact = ($('contact')?.value || '').trim();
@@ -514,7 +503,6 @@
       if (!contact){ toast('담당자명을 입력해주세요.'); $('contact')?.focus(); return false; }
       if (!email){ toast('이메일을 입력해주세요.'); $('email')?.focus(); return false; }
 
-      // 간단 이메일 형식 체크(너무 엄격하지 않게)
       const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
       if (!ok){ toast('이메일 형식을 확인해주세요.'); $('email')?.focus(); return false; }
       return true;
@@ -568,7 +556,6 @@
       }
     }
 
-    // ✅ 제품명 표기 변경
     function buildRows(state){
       const rows = [];
       if (state.qtyRecruiter > 0)
@@ -645,7 +632,6 @@
       return { total, rows, aiTier, quoteNo };
     }
 
-    // ===== 시트 저장(중복 1회 방지) =====
     function getSheetLogKey(quoteNo){
       return `lk_sheet_logged_${quoteNo}`;
     }
@@ -693,6 +679,7 @@
       };
     }
 
+    // ✅ 파일명: Linkedin 솔루션 견적서_오늘날짜_시간
     function fileStamp(){
       const d = new Date();
       const y = d.getFullYear();
@@ -703,23 +690,21 @@
       return `${y}${m}${day}_${hh}${mm}`;
     }
 
+    // ✅ 참고사항: 2가지 사항 + 줄바꿈 + 오른쪽 한칸 들여쓰기
     function tierNoteHtml(aiTier){
       if (!aiTier || aiTier === 'none') return '';
       const cap = PRICES.ai[aiTier]?.cap || 0;
       const app = PRICES.ai[aiTier]?.app || 0;
       const tierLabel = `Tier ${aiTier.slice(1)}`;
       return `
-        <div style="margin-top:14px;font-size:10.5px;color:#000;line-height:1.6;">
+        <div style="margin-top:14px;font-size:10.5px;color:#000;line-height:1.7;">
           <b>참고사항</b><br/>
-          • 선택한 ${tierLabel} 기준: 13억명 후보자 AI평가 및 추천 <b>${nfmt(cap)}명</b><br/>
-          • 채용공고 지원자 중 AI평가 <b>${nfmt(app)}명</b>
+          <div style="margin-left:10px;">
+            1) 선택한 ${tierLabel} 기준: 13억명 후보자 AI평가 및 추천 <b>${nfmt(cap)}명</b><br/>
+            2) 채용공고 지원자 중 AI평가 <b>${nfmt(app)}명</b>
+          </div>
         </div>
       `;
-    }
-
-    /* ✅ PDF 표 스타일: 바깥 테두리 두껍게, 내부선 얇게 */
-    function thickOuterTable(html){
-      return html;
     }
 
     function renderCaptureHtml({ total, rows, quoteNo, aiTier }){
@@ -745,16 +730,15 @@
 
       return `
         <div style="color:#000;">
-          <!-- 제목 -->
-          <div style="font-size:30px;font-weight:900;margin:0 0 18px;letter-spacing:-.2px;">
+          <div style="font-size:30px;font-weight:900;margin:0 0 22px;letter-spacing:-.2px;">
             Linkedin Solution 견적서
           </div>
 
-          <!-- ✅ 제목과 표 간격 -->
-          <div style="height:10px"></div>
+          <!-- 제목-상단표 간격 -->
+          <div style="height:14px"></div>
 
-          <!-- 상단 정보 표(바깥 굵게, 내부 얇게) -->
-          <div style="border:2px solid #000;">
+          <!-- ✅ 바깥 테두리: 얇게 (1.25px) -->
+          <div style="border:1.25px solid #000;">
             <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
               <tbody>
                 <tr>
@@ -783,11 +767,11 @@
             </table>
           </div>
 
-          <!-- ✅ 상단표와 항목표 간격 -->
-          <div style="height:16px"></div>
+          <!-- 상단표-항목표 간격 -->
+          <div style="height:18px"></div>
 
-          <!-- 항목 표(바깥 굵게, 내부 얇게 / 내부는 세로선 최소화: 가로선 중심) -->
-          <div style="border:2px solid #000;">
+          <!-- ✅ 바깥 테두리: 얇게 (1.25px) -->
+          <div style="border:1.25px solid #000;">
             <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
               <thead>
                 <tr>
@@ -809,14 +793,14 @@
 
           ${tierNoteHtml(aiTier)}
 
-          <!-- ✅ 하단 내용: A4 맨 아래쪽으로 밀기 -->
-          <div style="height:90px"></div>
+          <!-- ✅ 하단을 A4 맨 아래쪽으로 더 내리기: 큰 스페이서 -->
+          <div style="height:170px"></div>
 
           <div style="text-align:center;">
             <div style="font-size:18px;font-weight:900;color:#000;">Linkedin Korea Partner</div>
             <div style="margin-top:6px;font-size:11px;color:#000;">02-6405-4446 / help@hrpoint.co.kr</div>
 
-            <div style="margin-top:26px;font-size:11px;color:#000;">
+            <div style="margin-top:28px;font-size:11px;color:#000;">
               본 견적서는 단순 참고용입니다.
             </div>
           </div>
@@ -862,7 +846,8 @@
         remaining -= pageH;
       }
 
-      const filename = `Linkedin Korea Partner_${fileStamp()}.pdf`;
+      // ✅ 파일명 변경
+      const filename = `Linkedin 솔루션 견적서_${fileStamp()}.pdf`;
       pdf.save(filename);
     }
 
@@ -875,14 +860,13 @@
     }
 
     async function onDownloadPdf(){
-      if (!validateRequired()) return;      // ✅ 필수값 없으면 다운로드 차단
+      if (!validateRequired()) return;
       const ok = await logOnceForCurrentQuote();
       if (!ok) { toast('선택된 항목이 없습니다.'); return; }
       await makePdfByCapture();
     }
 
     async function onCopyLink(){
-      // 링크복사는 필수값 강제하지 않음(원하면 강제 가능)
       const ok = await logOnceForCurrentQuote();
       if (!ok) { toast('선택된 항목이 없습니다.'); return; }
 

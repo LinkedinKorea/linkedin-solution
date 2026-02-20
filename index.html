@@ -88,7 +88,7 @@
     .productRow{border-top:1px solid rgba(31,41,55,.85)}
     .productRow:first-child{border-top:none}
 
-    /* ✅ 가로 스크롤바 제거 */
+    /* ✅ 테이블 */
     table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
     th, td{
       padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:top;
@@ -104,6 +104,7 @@
     .kpi .v{font-size:28px;font-weight:1000;margin-top:6px;letter-spacing:-.3px}
     .kpi .v.smallItems{font-size:14px;font-weight:650;line-height:1.4}
     .vatSmall{font-size:10px;color:var(--muted);margin-top:6px}
+    .annualTiny{font-size:11px;color:var(--muted);font-weight:700;margin-left:8px}
 
     .callout{
       margin-top:12px;padding:10px 12px;border-radius:14px;
@@ -160,24 +161,22 @@
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
     .muted{color:var(--muted)}
 
-    /* ✅ PDF 캡처 전용(화면에는 안 보임)
-       - A4 여백 30mm: 내부 padding으로 구현 (30mm≈113px @96dpi 느낌)
-       - PDF 폰트: 맑은 고딕 계열 우선
-    */
+    /* ✅ PDF 캡처 전용: A4 여백 30mm 느낌 + 폰트 분리(영문 Arial / 한글 맑은고딕) */
     #pdfCaptureRoot{
       position:fixed;
       left:-99999px; top:0;
       width:794px;
       background:#ffffff;
       color:#000;
-      padding:113px;
+      padding:113px; /* 30mm 느낌 */
       z-index:-1;
-      font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+      font-family:"Malgun Gothic","맑은 고딕","Arial","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
     }
     #pdfCaptureRoot *{
       box-sizing:border-box;
-      font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
     }
+    .pdf-ko{font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo","Noto Sans KR",sans-serif;}
+    .pdf-en{font-family:"Arial",sans-serif;}
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" crossorigin="anonymous"></script>
@@ -202,7 +201,6 @@
       <div class="card">
         <div class="hd"><b>입력</b><span class="meta">전체 입력값은 PDF에 포함됩니다</span></div>
         <div class="bd">
-
           <div class="sectionBox" style="background:rgba(12,21,40,.45)">
             <div class="sectionTitle">
               <span>고객정보</span>
@@ -382,7 +380,10 @@
         <div class="bd" id="summaryBox">
           <div class="kpis">
             <div class="kpi">
-              <div class="t">총 합계</div>
+              <div class="t">
+                총 합계
+                <span class="annualTiny">&nbsp;&nbsp;&nbsp;/연간금액</span>
+              </div>
               <div class="v" id="total">-</div>
               <div class="vatSmall">※ 부가세 없음</div>
             </div>
@@ -470,6 +471,9 @@
 
     const nfmt = (n) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(n || 0));
     const money = (n) => `$${nfmt(n)}`;
+    const moneyAnnual = (n) => `${money(n)} <span style="font-size:11px;color:#6b7280;font-weight:700;">/연간</span>`;
+    const moneyAnnualPlain = (n) => `${money(n)} /연간`;
+
     const toNum = (v) => {
       if (v == null) return 0;
       const s = String(v).replace(/[\s,]/g,'').trim();
@@ -591,10 +595,11 @@
       const amtLTI = qtyLTI * PRICES.lti;
       const total = amtRecruiter + amtJob + amtAI + amtLTI;
 
-      $('amtRecruiter').value = money(amtRecruiter);
-      $('amtJob').value = money(amtJob);
-      $('amtAI').value = money(amtAI);
-      $('amtLTI').value = money(amtLTI);
+      // ✅ 계산기: 각 금액 뒤에 /연간 표시
+      $('amtRecruiter').value = amtRecruiter ? `${money(amtRecruiter)} /연간` : `${money(0)} /연간`;
+      $('amtJob').value = amtJob ? `${money(amtJob)} /연간` : `${money(0)} /연간`;
+      $('amtAI').value = (aiTier === 'none') ? `${money(0)} /연간` : `${money(amtAI)} /연간`;
+      $('amtLTI').value = amtLTI ? `${money(amtLTI)} /연간` : `${money(0)} /연간`;
       $('amtLife').value = (lifeInclude === 'yes') ? '문의' : '-';
 
       if (aiTier === 'none') {
@@ -605,8 +610,9 @@
         $('aiApplicant').value = `${nfmt(PRICES.ai[aiTier].app)}명`;
       }
 
-      $('total').textContent = money(total);
-      $('total2').textContent = money(total);
+      // ✅ 총합계: /연간금액 표시(작게)
+      $('total').innerHTML = `${money(total)} <span style="font-size:12px;color:#9ca3af;font-weight:800;margin-left:10px;">/연간금액</span>`;
+      $('total2').innerHTML = `${money(total)} <span style="font-size:11px;color:#9ca3af;font-weight:800;margin-left:8px;">/연간금액</span>`;
 
       const rows = buildRows({ aiTier, qtyRecruiter, qtyJob, qtyLTI, lifeInclude, amtRecruiter, amtAI, amtJob, amtLTI, total });
 
@@ -625,11 +631,11 @@
       tb.innerHTML = rows.length ? rows.map(r => {
         const unit = (r.unit == null) ? '문의' : money(r.unit);
         const qty = (r.qty == null) ? '-' : nfmt(r.qty);
-        const amt = (r.amount == null) ? '문의' : money(r.amount);
+        const amt = (r.amount == null) ? '문의' : `${money(r.amount)} /연간`;
         return `<tr><td>${r.name}</td><td class="right">${unit}</td><td class="right">${qty}</td><td class="right">${amt}</td></tr>`;
       }).join('') : `<tr><td colspan="4" class="muted">선택된 항목이 없습니다.</td></tr>`;
 
-      return { total, rows, aiTier, quoteNo };
+      return { total, rows, aiTier, quoteNo, amtRecruiter, amtJob, amtAI, amtLTI };
     }
 
     function getSheetLogKey(quoteNo){
@@ -679,7 +685,6 @@
       };
     }
 
-    // ✅ 파일명: Linkedin 솔루션 견적서_오늘날짜_시간
     function fileStamp(){
       const d = new Date();
       const y = d.getFullYear();
@@ -690,14 +695,13 @@
       return `${y}${m}${day}_${hh}${mm}`;
     }
 
-    // ✅ 참고사항: 2가지 사항 + 줄바꿈 + 오른쪽 한칸 들여쓰기
     function tierNoteHtml(aiTier){
       if (!aiTier || aiTier === 'none') return '';
       const cap = PRICES.ai[aiTier]?.cap || 0;
       const app = PRICES.ai[aiTier]?.app || 0;
       const tierLabel = `Tier ${aiTier.slice(1)}`;
       return `
-        <div style="margin-top:14px;font-size:10.5px;color:#000;line-height:1.7;">
+        <div class="pdf-ko" style="margin-top:14px;font-size:10.5px;color:#000;line-height:1.7;">
           <b>참고사항</b><br/>
           <div style="margin-left:10px;">
             1) 선택한 ${tierLabel} 기준: 13억명 후보자 AI평가 및 추천 <b>${nfmt(cap)}명</b><br/>
@@ -714,93 +718,102 @@
       const quoteDate = $('quoteDate').value || new Date().toISOString().slice(0,10);
       const validUntil = $('validUntil').value || addDaysISO(quoteDate, 20);
 
+      // 금액 글씨 조금 더 크게(PDF)
       const bodyRows = rows.map(r => {
         const unit = (r.unit == null) ? '문의' : money(r.unit);
         const qty = (r.qty == null) ? '-' : String(r.qty);
-        const amt = (r.amount == null) ? '문의' : money(r.amount);
+        const amt = (r.amount == null) ? '문의' : `${money(r.amount)} /연간`;
+
+        // 금액(영문/숫자)은 Arial
+        const amtHtml = (r.amount == null) ? '문의' : `<span class="pdf-en" style="font-size:12px;font-weight:900;">${money(r.amount)}</span> <span class="pdf-ko" style="font-size:10px;">/연간</span>`;
+
         return `
           <tr>
-            <td style="padding:7px;font-size:10.2px;font-weight:700;color:#000;border-top:1px solid #000;border-bottom:1px solid #000;">${r.name}</td>
-            <td style="padding:7px;font-size:10.2px;color:#000;text-align:right;border-top:1px solid #000;border-bottom:1px solid #000;">${unit}</td>
-            <td style="padding:7px;font-size:10.2px;color:#000;text-align:right;border-top:1px solid #000;border-bottom:1px solid #000;">${qty}</td>
-            <td style="padding:7px;font-size:10.2px;font-weight:900;color:#000;text-align:right;border-top:1px solid #000;border-bottom:1px solid #000;">${amt}</td>
+            <td class="pdf-ko" style="padding:7px;font-size:10.2px;font-weight:700;color:#000;border-top:1px solid #000;border-bottom:1px solid #000;">${r.name}</td>
+            <td class="pdf-en" style="padding:7px;font-size:10.2px;color:#000;text-align:right;border-top:1px solid #000;border-bottom:1px solid #000;">${unit}</td>
+            <td class="pdf-en" style="padding:7px;font-size:10.2px;color:#000;text-align:right;border-top:1px solid #000;border-bottom:1px solid #000;">${qty}</td>
+            <td style="padding:7px;text-align:right;border-top:1px solid #000;border-bottom:1px solid #000;">
+              ${r.amount == null ? `<span class="pdf-ko" style="font-size:11px;font-weight:900;color:#000;">문의</span>` : amtHtml}
+            </td>
           </tr>
         `;
       }).join('');
 
       return `
         <div style="color:#000;">
-          <div style="font-size:30px;font-weight:900;margin:0 0 22px;letter-spacing:-.2px;">
+          <div class="pdf-en" style="font-size:30px;font-weight:900;margin:0 0 22px;letter-spacing:-.2px;">
             Linkedin Solution 견적서
           </div>
 
-          <!-- 제목-상단표 간격 -->
           <div style="height:14px"></div>
 
-          <!-- ✅ 바깥 테두리: 얇게 (1.25px) -->
           <div style="border:1.25px solid #000;">
             <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
               <tbody>
                 <tr>
-                  <th style="background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;width:18%;border-right:1px solid #000;border-bottom:1px solid #000;">견적번호</th>
-                  <td style="padding:8px;font-size:11px;color:#000;width:32%;border-right:1px solid #000;border-bottom:1px solid #000;">${quoteNo}</td>
-                  <th style="background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;width:18%;border-right:1px solid #000;border-bottom:1px solid #000;">견적일</th>
-                  <td style="padding:8px;font-size:11px;color:#000;width:32%;border-bottom:1px solid #000;">${quoteDate}</td>
+                  <th class="pdf-ko" style="background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;width:18%;border-right:1px solid #000;border-bottom:1px solid #000;">견적번호</th>
+                  <td class="pdf-en" style="padding:8px;font-size:11px;color:#000;width:32%;border-right:1px solid #000;border-bottom:1px solid #000;">${quoteNo}</td>
+                  <th class="pdf-ko" style="background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;width:18%;border-right:1px solid #000;border-bottom:1px solid #000;">견적일</th>
+                  <td class="pdf-en" style="padding:8px;font-size:11px;color:#000;width:32%;border-bottom:1px solid #000;">${quoteDate}</td>
                 </tr>
                 <tr>
-                  <th style="background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;border-right:1px solid #000;border-bottom:1px solid #000;">유효기간</th>
-                  <td style="padding:8px;font-size:11px;color:#000;border-right:1px solid #000;border-bottom:1px solid #000;">${validUntil} (20일)</td>
-                  <th style="background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;border-right:1px solid #000;border-bottom:1px solid #000;">VAT</th>
-                  <td style="padding:8px;font-size:11px;color:#000;border-bottom:1px solid #000;">해당없음</td>
+                  <th class="pdf-ko" style="background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;border-right:1px solid #000;border-bottom:1px solid #000;">유효기간</th>
+                  <td class="pdf-en" style="padding:8px;font-size:11px;color:#000;border-right:1px solid #000;border-bottom:1px solid #000;">${validUntil} (20일)</td>
+                  <th class="pdf-ko" style="background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;border-right:1px solid #000;border-bottom:1px solid #000;">VAT</th>
+                  <td class="pdf-ko" style="padding:8px;font-size:11px;color:#000;border-bottom:1px solid #000;">해당없음</td>
                 </tr>
                 <tr>
-                  <th style="background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;border-right:1px solid #000;border-bottom:1px solid #000;">회사명</th>
-                  <td style="padding:8px;font-size:11px;color:#000;border-right:1px solid #000;border-bottom:1px solid #000;">${company || '-'}</td>
-                  <th style="background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;border-right:1px solid #000;border-bottom:1px solid #000;">담당자</th>
-                  <td style="padding:8px;font-size:11px;color:#000;border-bottom:1px solid #000;">${contact || '-'}</td>
+                  <th class="pdf-ko" style="background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;border-right:1px solid #000;border-bottom:1px solid #000;">회사명</th>
+                  <td class="pdf-ko" style="padding:8px;font-size:11px;color:#000;border-right:1px solid #000;border-bottom:1px solid #000;">${company || '-'}</td>
+                  <th class="pdf-ko" style="background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;border-right:1px solid #000;border-bottom:1px solid #000;">담당자</th>
+                  <td class="pdf-ko" style="padding:8px;font-size:11px;color:#000;border-bottom:1px solid #000;">${contact || '-'}</td>
                 </tr>
                 <tr>
-                  <th style="background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;border-right:1px solid #000;">이메일</th>
-                  <td colspan="3" style="padding:8px;font-size:11px;color:#000;">${email || '-'}</td>
+                  <th class="pdf-ko" style="background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;border-right:1px solid #000;">이메일</th>
+                  <td class="pdf-en" colspan="3" style="padding:8px;font-size:11px;color:#000;">${email || '-'}</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <!-- 상단표-항목표 간격 -->
           <div style="height:18px"></div>
 
-          <!-- ✅ 바깥 테두리: 얇게 (1.25px) -->
           <div style="border:1.25px solid #000;">
             <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
               <thead>
                 <tr>
-                  <th style="padding:8px;background:#e5e7eb;width:45%;text-align:center;font-size:11px;font-weight:900;color:#000;border-bottom:1px solid #000;">항목</th>
-                  <th style="padding:8px;background:#e5e7eb;width:18%;text-align:center;font-size:11px;font-weight:900;color:#000;border-bottom:1px solid #000;">단가(USD)</th>
-                  <th style="padding:8px;background:#e5e7eb;width:10%;text-align:center;font-size:11px;font-weight:900;color:#000;border-bottom:1px solid #000;">수량</th>
-                  <th style="padding:8px;background:#e5e7eb;width:27%;text-align:center;font-size:11px;font-weight:900;color:#000;border-bottom:1px solid #000;">금액(USD)</th>
+                  <th class="pdf-ko" style="padding:8px;background:#e5e7eb;width:45%;text-align:center;font-size:11px;font-weight:900;color:#000;border-bottom:1px solid #000;">항목</th>
+                  <th class="pdf-ko" style="padding:8px;background:#e5e7eb;width:18%;text-align:center;font-size:11px;font-weight:900;color:#000;border-bottom:1px solid #000;">단가(USD)</th>
+                  <th class="pdf-ko" style="padding:8px;background:#e5e7eb;width:10%;text-align:center;font-size:11px;font-weight:900;color:#000;border-bottom:1px solid #000;">수량</th>
+                  <th class="pdf-ko" style="padding:8px;background:#e5e7eb;width:27%;text-align:center;font-size:11px;font-weight:900;color:#000;border-bottom:1px solid #000;">금액(USD)</th>
                 </tr>
               </thead>
               <tbody>
-                ${bodyRows || `<tr><td colspan="4" style="padding:8px;font-size:11px;color:#000;border-top:1px solid #000;">선택된 항목이 없습니다.</td></tr>`}
+                ${bodyRows || `<tr><td colspan="4" class="pdf-ko" style="padding:8px;font-size:11px;color:#000;border-top:1px solid #000;">선택된 항목이 없습니다.</td></tr>`}
               </tbody>
             </table>
           </div>
 
-          <div style="margin-top:10px;font-size:18px;font-weight:900;text-align:right;color:#000;">
-            Total (USD) : ${money(total)}
+          <!-- ✅ Total 금액 크게 + 아래에 연간금액(vat없음) -->
+          <div style="margin-top:10px;text-align:right;">
+            <div class="pdf-en" style="font-size:20px;font-weight:900;color:#000;">
+              Total (USD) : ${money(total)}
+            </div>
+            <div class="pdf-ko" style="margin-top:4px;font-size:11px;color:#000;">
+              연간금액(vat없음)
+            </div>
           </div>
 
           ${tierNoteHtml(aiTier)}
 
-          <!-- ✅ 하단을 A4 맨 아래쪽으로 더 내리기: 큰 스페이서 -->
-          <div style="height:170px"></div>
+          <!-- ✅ Partner 영역을 "완전 아래"로: 스페이서를 더 크게 -->
+          <div style="height:230px"></div>
 
           <div style="text-align:center;">
-            <div style="font-size:18px;font-weight:900;color:#000;">Linkedin Korea Partner</div>
-            <div style="margin-top:6px;font-size:11px;color:#000;">02-6405-4446 / help@hrpoint.co.kr</div>
+            <div class="pdf-en" style="font-size:18px;font-weight:900;color:#000;">Linkedin Korea Partner</div>
+            <div class="pdf-en" style="margin-top:6px;font-size:11px;color:#000;">02-6405-4446 / help@hrpoint.co.kr</div>
 
-            <div style="margin-top:28px;font-size:11px;color:#000;">
+            <div class="pdf-ko" style="margin-top:28px;font-size:11px;color:#000;">
               본 견적서는 단순 참고용입니다.
             </div>
           </div>
@@ -846,7 +859,6 @@
         remaining -= pageH;
       }
 
-      // ✅ 파일명 변경
       const filename = `Linkedin 솔루션 견적서_${fileStamp()}.pdf`;
       pdf.save(filename);
     }

@@ -89,7 +89,7 @@
     .productRow{border-top:1px solid rgba(31,41,55,.85)}
     .productRow:first-child{border-top:none}
 
-    /* ✅ 가로 스크롤바 제거: 테이블이 카드 안에서 줄바꿈 되도록 */
+    /* ✅ 가로 스크롤바 제거 */
     table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
     th, td{
       padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:top;
@@ -170,7 +170,7 @@
     #pdfCaptureRoot{
       position:fixed;
       left:-99999px; top:0;
-      width:794px; /* A4 폭 캡처 안정화 */
+      width:794px;
       background:#ffffff;
       color:#111827;
       padding:24px;
@@ -550,7 +550,7 @@
       }
     }
 
-    // ✅ 제품명 표기 변경(요청 반영)
+    // ✅ 제품명 표기 변경
     function buildRows(state){
       const rows = [];
       if (state.qtyRecruiter > 0)
@@ -690,8 +690,23 @@
       return `${y}${m}${day}_${hh}${mm}`;
     }
 
-    // ===== ✅ PDF: html2canvas 캡처 방식(한글 깨짐 방지) =====
-    function renderCaptureHtml({ total, rows, quoteNo }){
+    // ✅ Tier 참고사항 문구: 선택된 tier일 때만 수치 포함
+    function tierNoteHtml(aiTier){
+      if (!aiTier || aiTier === 'none') return '';
+      const cap = PRICES.ai[aiTier]?.cap || 0;
+      const app = PRICES.ai[aiTier]?.app || 0;
+      const tierLabel = `Tier ${aiTier.slice(1)}`;
+      return `
+        <div style="margin-top:10px;font-size:10.5px;color:#000;line-height:1.55;">
+          <b>참고사항</b><br/>
+          • 선택한 ${tierLabel} 기준: 13억명 후보자 AI평가 및 추천 <b>${nfmt(cap)}명</b><br/>
+          • 채용공고 지원자 중 AI평가 <b>${nfmt(app)}명</b>
+        </div>
+      `;
+    }
+
+    // ===== ✅ PDF: 캡처 렌더링(표 가독성 강화 + 정보 테이블화) =====
+    function renderCaptureHtml({ total, rows, quoteNo, aiTier }){
       const company = $('company').value || '';
       const contact = $('contact').value || '';
       const email = $('email').value || '';
@@ -704,66 +719,77 @@
         const amt = (r.amount == null) ? '문의' : money(r.amount);
         return `
           <tr>
-            <td style="font-weight:700;color:#000;">${r.name}</td>
-            <td class="right" style="color:#000;">${unit}</td>
-            <td class="right" style="color:#000;">${qty}</td>
-            <td class="right" style="font-weight:900;color:#000;">${amt}</td>
+            <td style="border:1px solid #000;padding:7px;font-size:10.5px;font-weight:700;color:#000;vertical-align:top;">${r.name}</td>
+            <td style="border:1px solid #000;padding:7px;font-size:10.5px;color:#000;text-align:right;vertical-align:top;">${unit}</td>
+            <td style="border:1px solid #000;padding:7px;font-size:10.5px;color:#000;text-align:right;vertical-align:top;">${qty}</td>
+            <td style="border:1px solid #000;padding:7px;font-size:10.5px;font-weight:900;color:#000;text-align:right;vertical-align:top;">${amt}</td>
           </tr>
         `;
       }).join('');
 
-      const tierNote = `
-        <div style="margin-top:14px;font-size:11px;color:#000;line-height:1.6;">
-          <b>참고사항</b><br/>
-          • Tier1 : 200명 AI 평가<br/>
-          • Tier2 : 800명 AI 평가<br/>
-          • Tier3 : 1500명 AI 평가
-        </div>
-      `;
-
       return `
         <div style="font-family:Apple SD Gothic Neo, Noto Sans KR, sans-serif; color:#000;">
-          <div style="font-size:30px;font-weight:900;margin:0 0 14px;letter-spacing:-.2px;">
+          <div style="font-size:30px;font-weight:900;margin:0 0 12px;letter-spacing:-.2px;">
             Linkedin Solution 견적서
           </div>
 
-          <div style="font-size:12px;line-height:1.7;margin-bottom:10px;">
-            견적번호: <b>${quoteNo}</b> &nbsp; | &nbsp; 견적일: <b>${quoteDate}</b><br/>
-            유효기간: <b>${validUntil}</b> (20일) &nbsp; | &nbsp; VAT: <b>해당없음</b>
-          </div>
-
-          <div style="border:1px solid #000;padding:10px;margin-bottom:12px;font-size:12px;line-height:1.7;">
-            회사명: <b>${company || '-'}</b><br/>
-            담당자: <b>${contact || '-'}</b><br/>
-            이메일: <b>${email || '-'}</b>
-          </div>
-
-          <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
-            <thead>
-              <tr>
-                <th style="border:1px solid #000;padding:8px;background:#e5e7eb;width:45%;text-align:left;">항목</th>
-                <th style="border:1px solid #000;padding:8px;background:#e5e7eb;width:18%;text-align:right;">단가(USD)</th>
-                <th style="border:1px solid #000;padding:8px;background:#e5e7eb;width:10%;text-align:right;">수량</th>
-                <th style="border:1px solid #000;padding:8px;background:#e5e7eb;width:27%;text-align:right;">금액(USD)</th>
-              </tr>
-            </thead>
+          <!-- ✅ 상단 정보도 표로 정리 -->
+          <table style="width:100%;border-collapse:collapse;table-layout:fixed;margin-bottom:10px;">
             <tbody>
-              ${bodyRows || `<tr><td colspan="4" style="border:1px solid #000;padding:8px;">선택된 항목이 없습니다.</td></tr>`}
+              <tr>
+                <th style="border:1px solid #000;background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;width:18%;">견적번호</th>
+                <td style="border:1px solid #000;padding:8px;font-size:11px;color:#000;width:32%;">${quoteNo}</td>
+                <th style="border:1px solid #000;background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;width:18%;">견적일</th>
+                <td style="border:1px solid #000;padding:8px;font-size:11px;color:#000;width:32%;">${quoteDate}</td>
+              </tr>
+              <tr>
+                <th style="border:1px solid #000;background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;">유효기간</th>
+                <td style="border:1px solid #000;padding:8px;font-size:11px;color:#000;">${validUntil} (20일)</td>
+                <th style="border:1px solid #000;background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;">VAT</th>
+                <td style="border:1px solid #000;padding:8px;font-size:11px;color:#000;">해당없음</td>
+              </tr>
+              <tr>
+                <th style="border:1px solid #000;background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;">회사명</th>
+                <td style="border:1px solid #000;padding:8px;font-size:11px;color:#000;">${company || '-'}</td>
+                <th style="border:1px solid #000;background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;">담당자</th>
+                <td style="border:1px solid #000;padding:8px;font-size:11px;color:#000;">${contact || '-'}</td>
+              </tr>
+              <tr>
+                <th style="border:1px solid #000;background:#f3f4f6;padding:8px;font-size:11px;font-weight:900;color:#000;text-align:center;">이메일</th>
+                <td colspan="3" style="border:1px solid #000;padding:8px;font-size:11px;color:#000;">${email || '-'}</td>
+              </tr>
             </tbody>
           </table>
 
-          <div style="margin-top:12px;font-size:18px;font-weight:900;text-align:right;">
+          <!-- ✅ 견적 내역 -->
+          <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+            <thead>
+              <tr>
+                <th style="border:1px solid #000;padding:8px;background:#e5e7eb;width:45%;text-align:center;font-size:11px;font-weight:900;color:#000;">항목</th>
+                <th style="border:1px solid #000;padding:8px;background:#e5e7eb;width:18%;text-align:center;font-size:11px;font-weight:900;color:#000;">단가(USD)</th>
+                <th style="border:1px solid #000;padding:8px;background:#e5e7eb;width:10%;text-align:center;font-size:11px;font-weight:900;color:#000;">수량</th>
+                <th style="border:1px solid #000;padding:8px;background:#e5e7eb;width:27%;text-align:center;font-size:11px;font-weight:900;color:#000;">금액(USD)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${bodyRows || `<tr><td colspan="4" style="border:1px solid #000;padding:8px;font-size:11px;color:#000;">선택된 항목이 없습니다.</td></tr>`}
+            </tbody>
+          </table>
+
+          <div style="margin-top:10px;font-size:18px;font-weight:900;text-align:right;color:#000;">
             Total (USD) : ${money(total)}
           </div>
 
-          ${tierNote}
+          ${tierNoteHtml(aiTier)}
 
-          <div style="margin-top:40px;text-align:center;font-size:11px;color:#000;">
-            본 견적서는 단순 참고용입니다.
-          </div>
+          <!-- ✅ 하단 영역(간격 포함) -->
+          <div style="margin-top:52px;text-align:center;">
+            <div style="font-size:18px;font-weight:900;color:#000;">Linkedin Korea Partner</div>
+            <div style="margin-top:6px;font-size:11px;color:#000;">02-6405-4446 / help@hrpoint.co.kr</div>
 
-          <div style="margin-top:40px;text-align:center;font-size:18px;font-weight:900;color:#000;">
-            Linkedin Korea Partner
+            <div style="margin-top:26px;font-size:11px;color:#000;">
+              본 견적서는 단순 참고용입니다.
+            </div>
           </div>
         </div>
       `;
@@ -775,7 +801,7 @@
       if (!rows.length) { toast('선택된 항목이 없습니다.'); return; }
 
       const root = $('pdfCaptureRoot');
-      root.innerHTML = renderCaptureHtml({ total, rows, quoteNo });
+      root.innerHTML = renderCaptureHtml({ total, rows, quoteNo, aiTier });
 
       const canvas = await html2canvas(root, {
         scale: 2,

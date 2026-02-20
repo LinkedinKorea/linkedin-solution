@@ -128,8 +128,11 @@
       background:rgba(8,12,18,.72);backdrop-filter:blur(10px);
       border-top:1px solid var(--line)
     }
-    .sticky .inner{max-width:1120px;margin:0 auto;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .sticky .inner{max-width:1120px;margin:0 auto;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
     .btns{display:flex;gap:10px;flex-wrap:wrap}
+    .btns-right{margin-left:auto;gap:14px}
+    .tableWrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .tableWrap table{min-width:560px}
 
     button{
       appearance:none;border:1px solid var(--line);background:var(--soft);color:var(--text);
@@ -145,15 +148,6 @@
 
     .toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:rgba(17,24,39,.92);border:1px solid var(--line);padding:10px 12px;border-radius:12px;box-shadow:0 12px 24px rgba(0,0,0,.35);font-size:13px;display:none;z-index:9999}
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
-
-    .discountNote{
-      margin-top:10px;
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.5;
-      border-top:1px dashed rgba(31,41,55,.8);
-      padding-top:10px;
-    }
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" crossorigin="anonymous"></script>
@@ -204,15 +198,15 @@
               <div class="row" style="grid-template-columns:1fr 1fr 1fr;align-items:end">
                 <div>
                   <label for="quoteNo">견적번호</label>
-                  <input id="quoteNo" class="mono" placeholder="자동 생성" />
+                  <input id="quoteNo" class="mono" placeholder="자동 생성" readonly />
                 </div>
                 <div>
                   <label for="quoteDate">견적일</label>
-                  <input id="quoteDate" type="date" />
+                  <input id="quoteDate" type="date" readonly />
                 </div>
                 <div>
                   <label for="validUntil">유효기간</label>
-                  <input id="validUntil" type="date" readonly />
+                  <input id="validUntil" type="text" readonly />
                 </div>
               </div>
 
@@ -292,8 +286,6 @@
                 </div>
 
                 <div class="row" style="grid-template-columns:1fr 160px 160px">
-                  <div class="desc">※ 13억명 후보자 중 Tier별 AI평가:
-Tier1=200, Tier2=800, Tier3=1500</div>
                   <div>
                     <label>13억명 후보자 중 AI평가</label>
                     <input id="aiCapacity" readonly />
@@ -366,9 +358,6 @@ Tier1=200, Tier2=800, Tier3=1500</div>
               <div class="v" id="total">-</div>
               <div class="muted">※ 부가세 없음</div>
 
-              <div class="discountNote" id="discountNote">
-                할인내용 : 그룹사 가격, 다년계약, 볼륨할인 등 문의
-              </div>
             </div>
 
             <div class="kpi">
@@ -379,6 +368,7 @@ Tier1=200, Tier2=800, Tier3=1500</div>
 
           <div style="height:12px"></div>
 
+          <div class="tableWrap">
           <table>
             <thead>
               <tr>
@@ -396,6 +386,7 @@ Tier1=200, Tier2=800, Tier3=1500</div>
               </tr>
             </tfoot>
           </table>
+          </div>
 
           <div id="minNotice" style="margin-top:10px;font-size:12px;font-weight:800;color:var(--warn);display:none;line-height:1.5">
             기업용 솔루션은 최소 합계금액이 $10,000 부터 계약이 가능합니다.<br/>
@@ -406,7 +397,8 @@ Tier1=200, Tier2=800, Tier3=1500</div>
             <b>기업용 솔루션 문의</b><br/>
             Linkedin Korea Partner<br/>
             02-6405-4446<br/>
-            help@hrpoint.co.kr
+            help@hrpoint.co.kr<br/>
+            할인내용 : 그룹사 가격, 다년계약, 볼륨할인 등 문의
           </div>
         </div>
       </div>
@@ -417,10 +409,12 @@ Tier1=200, Tier2=800, Tier3=1500</div>
 
   <div class="sticky">
     <div class="inner">
-      <div class="meta">버튼을 누르면 입력값 기준으로 견적서(PDF)가 다운로드됩니다. (USD 기준 · 부가세 없음)</div>
+      <div class="meta">견적서를 PDF로 다운받을수 있습니다. 본 견적서는 단순 참고용입니다.</div>
       <div class="btns">
-        <button id="btnCopyLink">입력값 링크 복사</button>
         <button id="btnReset">초기화</button>
+      </div>
+      <div class="btns btns-right">
+        <button id="btnCopyLink">견적서 결과 링크복사</button>
         <button class="primary" id="btnPdf">견적서 다운로드(PDF)</button>
       </div>
     </div>
@@ -513,11 +507,34 @@ Tier1=200, Tier2=800, Tier3=1500</div>
       return d.toISOString().slice(0,10);
     };
 
+    const getProductSignature = () => JSON.stringify({
+      qtyRecruiter: $('qtyRecruiter')?.value || '0',
+      qtyJob: $('qtyJob')?.value || '0',
+      aiTier: $('aiTier')?.value || 'none',
+      lifeInclude: $('lifeInclude')?.value || 'no',
+      qtyLTI: $('qtyLTI')?.value || '0'
+    });
+
+    function updateQuoteNoForSelection(){
+      const signature = getProductSignature();
+      const savedSignature = localStorage.getItem('quote_signature');
+      const savedQuoteNo = localStorage.getItem('quote_no');
+      if (savedSignature === signature && savedQuoteNo) {
+        $('quoteNo').value = savedQuoteNo;
+        return;
+      }
+      const nextQuoteNo = genQuoteNo();
+      $('quoteNo').value = nextQuoteNo;
+      localStorage.setItem('quote_signature', signature);
+      localStorage.setItem('quote_no', nextQuoteNo);
+    }
+
+
     function setDefaultQuoteFields(){
       const today = new Date().toISOString().slice(0,10);
-      if ($('quoteDate') && !$('quoteDate').value) $('quoteDate').value = today;
-      if ($('validUntil')) $('validUntil').value = addDaysISO($('quoteDate').value, 20);
-      if ($('quoteNo') && !$('quoteNo').value) $('quoteNo').value = genQuoteNo();
+      if ($('quoteDate')) $('quoteDate').value = today;
+      if ($('validUntil')) $('validUntil').value = addDaysISO(today, 20);
+      if ($('quoteNo')) updateQuoteNoForSelection();
     }
 
     function buildRows(state){
@@ -564,7 +581,7 @@ Tier1=200, Tier2=800, Tier3=1500</div>
       $('total2').textContent = money(total);
 
       const rows = buildRows({ aiTier, qtyRecruiter, qtyJob, qtyLTI, lifeInclude, amtRecruiter, amtAI, amtJob, amtLTI, total });
-      $('items').textContent = rows.length ? `${rows.length}개 항목` : '-';
+      $('items').textContent = rows.length ? rows.map(r => r.name).join(', ') : '-';
 
       const minNotice = document.getElementById('minNotice');
       if (minNotice) minNotice.style.display = (total > 0 && total < 10000) ? 'block' : 'none';
@@ -680,10 +697,6 @@ Tier1=200, Tier2=800, Tier3=1500</div>
       doc.setFontSize(12);
       doc.text(`Total (USD): ${money(total)}`, 360, endY);
 
-      // ✅ 할인 문구(PDF에도)
-      doc.setFontSize(10);
-      doc.text('할인내용 : 그룹사 가격, 다년계약, 볼륨할인 등 문의', marginX, endY + 22);
-
       // 하단 중앙 Partner 문구
       const pageH = doc.internal.pageSize.getHeight();
       doc.setFontSize(10);
@@ -713,7 +726,7 @@ Tier1=200, Tier2=800, Tier3=1500</div>
         qtyLTI: $('qtyLTI').value || '0'
       });
       const url = `${location.origin}${location.pathname}?${p.toString()}`;
-      try { await navigator.clipboard.writeText(url); toast('입력값 링크가 복사되었습니다.'); }
+      try { await navigator.clipboard.writeText(url); toast('견적서 결과 링크가 복사되었습니다.'); }
       catch(e){ toast('복사 실패'); }
     }
 
@@ -723,8 +736,6 @@ Tier1=200, Tier2=800, Tier3=1500</div>
       set('company','company');
       set('contact','contact');
       set('email','email');
-      set('quoteNo','quoteNo');
-      set('quoteDate','quoteDate');
       set('qtyRecruiter','qtyRecruiter');
       set('qtyJob','qtyJob');
       set('aiTier','aiTier');
@@ -736,8 +747,6 @@ Tier1=200, Tier2=800, Tier3=1500</div>
       $('company').value='';
       $('contact').value='';
       $('email').value='';
-      $('quoteNo').value='';
-      $('quoteDate').value='';
       $('qtyRecruiter').value='0';
       $('qtyJob').value='0';
       $('aiTier').value='none';
@@ -753,7 +762,7 @@ Tier1=200, Tier2=800, Tier3=1500</div>
     document.getElementById('btnCopyLink')?.addEventListener('click', async (e)=>{ e.preventDefault(); await copyLink(); });
     document.getElementById('btnReset')?.addEventListener('click', (e)=>{ e.preventDefault(); resetAll(); });
 
-    ['company','contact','email','quoteNo','quoteDate','qtyRecruiter','qtyJob','aiTier','lifeInclude','qtyLTI'].forEach(id=>{
+    ['company','contact','email','qtyRecruiter','qtyJob','aiTier','lifeInclude','qtyLTI'].forEach(id=>{
       const el = document.getElementById(id);
       if (!el) return;
       el.addEventListener('input', ()=>{ setDefaultQuoteFields(); recalc(); });

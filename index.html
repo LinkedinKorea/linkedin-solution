@@ -88,7 +88,6 @@
     .productRow{border-top:1px solid rgba(31,41,55,.85)}
     .productRow:first-child{border-top:none}
 
-    /* ✅ 테이블 */
     table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
     th, td{
       padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:top;
@@ -104,17 +103,29 @@
     .kpi .v{font-size:28px;font-weight:1000;margin-top:6px;letter-spacing:-.3px}
     .kpi .v.smallItems{font-size:14px;font-weight:650;line-height:1.4}
     .vatSmall{font-size:10px;color:var(--muted);margin-top:6px}
-    .annualTiny{font-size:11px;color:var(--muted);font-weight:700;margin-left:8px}
+
+    /* ✅ /연간 (더 작은 글씨) */
+    .annualTag{
+      font-size:10px;
+      color:var(--muted);
+      font-weight:800;
+      margin-left:6px;
+      white-space:nowrap;
+    }
+
+    /* ✅ 기업용 솔루션 문의(조금 더 크게) */
+    .callout.green{
+      border-color:rgba(52,211,153,.35);
+      background:rgba(52,211,153,.10);
+      color:#d1fae5;
+      font-size:13px; /* ↑ 약간 키움 */
+      line-height:1.6;
+    }
 
     .callout{
       margin-top:12px;padding:10px 12px;border-radius:14px;
       border:1px solid rgba(96,165,250,.25);background:rgba(96,165,250,.08);
       color:#dbeafe;font-size:12px;line-height:1.55
-    }
-    .callout.green{
-      border-color:rgba(52,211,153,.35);
-      background:rgba(52,211,153,.10);
-      color:#d1fae5
     }
 
     .aiBox{
@@ -161,20 +172,18 @@
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
     .muted{color:var(--muted)}
 
-    /* ✅ PDF 캡처 전용: A4 여백 30mm 느낌 + 폰트 분리(영문 Arial / 한글 맑은고딕) */
+    /* PDF 캡처용 */
     #pdfCaptureRoot{
       position:fixed;
       left:-99999px; top:0;
       width:794px;
       background:#ffffff;
       color:#000;
-      padding:113px; /* 30mm 느낌 */
+      padding:113px;
       z-index:-1;
       font-family:"Malgun Gothic","맑은 고딕","Arial","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
     }
-    #pdfCaptureRoot *{
-      box-sizing:border-box;
-    }
+    #pdfCaptureRoot *{box-sizing:border-box}
     .pdf-ko{font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo","Noto Sans KR",sans-serif;}
     .pdf-en{font-family:"Arial",sans-serif;}
   </style>
@@ -201,6 +210,7 @@
       <div class="card">
         <div class="hd"><b>입력</b><span class="meta">전체 입력값은 PDF에 포함됩니다</span></div>
         <div class="bd">
+
           <div class="sectionBox" style="background:rgba(12,21,40,.45)">
             <div class="sectionTitle">
               <span>고객정보</span>
@@ -380,10 +390,8 @@
         <div class="bd" id="summaryBox">
           <div class="kpis">
             <div class="kpi">
-              <div class="t">
-                총 합계
-                <span class="annualTiny">&nbsp;&nbsp;&nbsp;/연간금액</span>
-              </div>
+              <!-- ✅ 총 합계 텍스트 오른쪽 /연간금액 삭제 -->
+              <div class="t">총 합계</div>
               <div class="v" id="total">-</div>
               <div class="vatSmall">※ 부가세 없음</div>
             </div>
@@ -409,7 +417,8 @@
             <tfoot>
               <tr>
                 <th colspan="3" class="right">합계</th>
-                <th class="right" id="total2">-</th>
+                <!-- ✅ 맨 아랫쪽 합계: 왼쪽으로 약간 이동 + 큰 글씨 + 줄바꿈 방지 -->
+                <th class="right" id="total2" style="font-size:16px;font-weight:1000;white-space:nowrap;padding-right:18px;">-</th>
               </tr>
             </tfoot>
           </table>
@@ -471,8 +480,8 @@
 
     const nfmt = (n) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(n || 0));
     const money = (n) => `$${nfmt(n)}`;
-    const moneyAnnual = (n) => `${money(n)} <span style="font-size:11px;color:#6b7280;font-weight:700;">/연간</span>`;
-    const moneyAnnualPlain = (n) => `${money(n)} /연간`;
+    const annualSpan = `<span class="annualTag">/연간</span>`;
+    const annualSpan2 = `<span class="annualTag">/연간금액</span>`;
 
     const toNum = (v) => {
       if (v == null) return 0;
@@ -595,11 +604,11 @@
       const amtLTI = qtyLTI * PRICES.lti;
       const total = amtRecruiter + amtJob + amtAI + amtLTI;
 
-      // ✅ 계산기: 각 금액 뒤에 /연간 표시
-      $('amtRecruiter').value = amtRecruiter ? `${money(amtRecruiter)} /연간` : `${money(0)} /연간`;
-      $('amtJob').value = amtJob ? `${money(amtJob)} /연간` : `${money(0)} /연간`;
-      $('amtAI').value = (aiTier === 'none') ? `${money(0)} /연간` : `${money(amtAI)} /연간`;
-      $('amtLTI').value = amtLTI ? `${money(amtLTI)} /연간` : `${money(0)} /연간`;
+      // ✅ 각 제품 선택 금액 뒤에 /연간 (더 작게)
+      $('amtRecruiter').value = `${money(amtRecruiter)} /연간`;
+      $('amtJob').value = `${money(amtJob)} /연간`;
+      $('amtAI').value = `${money(amtAI)} /연간`;
+      $('amtLTI').value = `${money(amtLTI)} /연간`;
       $('amtLife').value = (lifeInclude === 'yes') ? '문의' : '-';
 
       if (aiTier === 'none') {
@@ -610,9 +619,9 @@
         $('aiApplicant').value = `${nfmt(PRICES.ai[aiTier].app)}명`;
       }
 
-      // ✅ 총합계: /연간금액 표시(작게)
-      $('total').innerHTML = `${money(total)} <span style="font-size:12px;color:#9ca3af;font-weight:800;margin-left:10px;">/연간금액</span>`;
-      $('total2').innerHTML = `${money(total)} <span style="font-size:11px;color:#9ca3af;font-weight:800;margin-left:8px;">/연간금액</span>`;
+      // ✅ 총합계 값: 금액 + 작은 /연간금액 (줄바꿈 방지)
+      $('total').innerHTML = `<span style="white-space:nowrap;">${money(total)} ${annualSpan2}</span>`;
+      $('total2').innerHTML = `<span style="white-space:nowrap;">${money(total)} ${annualSpan2}</span>`;
 
       const rows = buildRows({ aiTier, qtyRecruiter, qtyJob, qtyLTI, lifeInclude, amtRecruiter, amtAI, amtJob, amtLTI, total });
 
@@ -631,11 +640,11 @@
       tb.innerHTML = rows.length ? rows.map(r => {
         const unit = (r.unit == null) ? '문의' : money(r.unit);
         const qty = (r.qty == null) ? '-' : nfmt(r.qty);
-        const amt = (r.amount == null) ? '문의' : `${money(r.amount)} /연간`;
+        const amt = (r.amount == null) ? '문의' : `<span style="white-space:nowrap;">${money(r.amount)} ${annualSpan}</span>`;
         return `<tr><td>${r.name}</td><td class="right">${unit}</td><td class="right">${qty}</td><td class="right">${amt}</td></tr>`;
       }).join('') : `<tr><td colspan="4" class="muted">선택된 항목이 없습니다.</td></tr>`;
 
-      return { total, rows, aiTier, quoteNo, amtRecruiter, amtJob, amtAI, amtLTI };
+      return { total, rows, aiTier, quoteNo };
     }
 
     function getSheetLogKey(quoteNo){
@@ -718,23 +727,19 @@
       const quoteDate = $('quoteDate').value || new Date().toISOString().slice(0,10);
       const validUntil = $('validUntil').value || addDaysISO(quoteDate, 20);
 
-      // 금액 글씨 조금 더 크게(PDF)
       const bodyRows = rows.map(r => {
         const unit = (r.unit == null) ? '문의' : money(r.unit);
         const qty = (r.qty == null) ? '-' : String(r.qty);
-        const amt = (r.amount == null) ? '문의' : `${money(r.amount)} /연간`;
-
-        // 금액(영문/숫자)은 Arial
-        const amtHtml = (r.amount == null) ? '문의' : `<span class="pdf-en" style="font-size:12px;font-weight:900;">${money(r.amount)}</span> <span class="pdf-ko" style="font-size:10px;">/연간</span>`;
+        const amtHtml = (r.amount == null)
+          ? `<span class="pdf-ko" style="font-size:11px;font-weight:900;color:#000;">문의</span>`
+          : `<span class="pdf-en" style="font-size:12px;font-weight:900;">${money(r.amount)}</span> <span class="pdf-ko" style="font-size:9px;color:#6b7280;font-weight:900;">/연간</span>`;
 
         return `
           <tr>
             <td class="pdf-ko" style="padding:7px;font-size:10.2px;font-weight:700;color:#000;border-top:1px solid #000;border-bottom:1px solid #000;">${r.name}</td>
             <td class="pdf-en" style="padding:7px;font-size:10.2px;color:#000;text-align:right;border-top:1px solid #000;border-bottom:1px solid #000;">${unit}</td>
             <td class="pdf-en" style="padding:7px;font-size:10.2px;color:#000;text-align:right;border-top:1px solid #000;border-bottom:1px solid #000;">${qty}</td>
-            <td style="padding:7px;text-align:right;border-top:1px solid #000;border-bottom:1px solid #000;">
-              ${r.amount == null ? `<span class="pdf-ko" style="font-size:11px;font-weight:900;color:#000;">문의</span>` : amtHtml}
-            </td>
+            <td style="padding:7px;text-align:right;border-top:1px solid #000;border-bottom:1px solid #000;">${amtHtml}</td>
           </tr>
         `;
       }).join('');
@@ -794,10 +799,9 @@
             </table>
           </div>
 
-          <!-- ✅ Total 금액 크게 + 아래에 연간금액(vat없음) -->
           <div style="margin-top:10px;text-align:right;">
-            <div class="pdf-en" style="font-size:20px;font-weight:900;color:#000;">
-              Total (USD) : ${money(total)}
+            <div class="pdf-en" style="font-size:20px;font-weight:900;color:#000;white-space:nowrap;">
+              Total (USD) : ${money(total)} <span class="pdf-ko" style="font-size:9px;color:#6b7280;font-weight:900;">/연간금액</span>
             </div>
             <div class="pdf-ko" style="margin-top:4px;font-size:11px;color:#000;">
               연간금액(vat없음)
@@ -806,7 +810,6 @@
 
           ${tierNoteHtml(aiTier)}
 
-          <!-- ✅ Partner 영역을 "완전 아래"로: 스페이서를 더 크게 -->
           <div style="height:230px"></div>
 
           <div style="text-align:center;">

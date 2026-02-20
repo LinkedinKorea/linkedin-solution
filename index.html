@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LinkedIn 기업용 솔루션 자동 견적서</title>
   <style>
-    :root{--bg:#0b0f14;--card:#111827;--muted:#9ca3af;--text:#e5e7eb;--accent:#60a5fa;--line:#1f2937}
+    :root{--bg:#0b0f14;--card:#111827;--muted:#9ca3af;--text:#e5e7eb;--accent:#60a5fa;--line:#1f2937;--soft:#0b1220}
     *{box-sizing:border-box}
     body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,Helvetica,Arial; background:linear-gradient(180deg,#070a0f,#0b0f14 40%); color:var(--text)}
     a{color:var(--accent);text-decoration:none}
@@ -26,22 +26,23 @@
     .bd{padding:14px 16px}
 
     label{display:block;font-size:12px;color:#cbd5e1;margin-bottom:6px}
-    input, select{width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--line);background:#0b1220;color:var(--text);outline:none}
+    input, select{width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--line);background:var(--soft);color:var(--text);outline:none;font-family:inherit;font-size:13px}
+    input[type="date"]{font-family:inherit;font-size:13px;color:var(--text)}
     input:focus, select:focus{border-color:rgba(96,165,250,.6);box-shadow:0 0 0 3px rgba(96,165,250,.14)}
-    input[readonly]{opacity:.9}
+    input[readonly]{opacity:.92}
 
     .rows{display:grid;gap:16px}
-    .row{display:grid;grid-template-columns:1fr 160px 160px;gap:12px;align-items:end;padding:6px 0}
+    .row{display:grid;grid-template-columns:1fr 160px 160px;gap:12px;align-items:end;padding:8px 0}
     @media (max-width:720px){.row{grid-template-columns:1fr}}
 
-    .hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.35;min-height:32px}
+    .hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.35;min-height:18px}
+    .desc{color:var(--muted);font-size:12px;line-height:1.5;margin-top:4px;white-space:pre-line}
 
     table{width:100%;border-collapse:separate;border-spacing:0}
     th, td{padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:top}
     th{font-size:12px;color:#cbd5e1;text-align:left;background:rgba(11,18,32,.35)}
     td{font-size:13px}
     .right{text-align:right}
-    .muted{color:var(--muted);font-size:12px;line-height:1.55}
 
     .kpis{display:grid;gap:10px}
     .kpi{padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(11,18,32,.55)}
@@ -50,22 +51,23 @@
 
     .callout{margin-top:12px;padding:10px 12px;border-radius:14px;border:1px solid rgba(96,165,250,.25);background:rgba(96,165,250,.08);color:#dbeafe;font-size:12px;line-height:1.55}
 
+    .aiBox{border:1px dashed rgba(96,165,250,.35);background:rgba(96,165,250,.06);border-radius:16px;padding:12px;margin-top:6px}
+
     .sticky{position:fixed;left:0;right:0;bottom:0;padding:14px 14px;background:rgba(8,12,18,.72);backdrop-filter:blur(10px);border-top:1px solid var(--line)}
     .sticky .inner{max-width:1120px;margin:0 auto;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
     .btns{display:flex;gap:10px;flex-wrap:wrap}
-    button{appearance:none;border:1px solid var(--line);background:#0b1220;color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:800;font-size:13px}
+    button{appearance:none;border:1px solid var(--line);background:var(--soft);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:800;font-size:13px}
     button.primary{border-color:rgba(96,165,250,.45);background:rgba(96,165,250,.14)}
     button:hover{filter:brightness(1.07)}
 
     .toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:rgba(17,24,39,.92);border:1px solid var(--line);padding:10px 12px;border-radius:12px;box-shadow:0 12px 24px rgba(0,0,0,.35);font-size:13px;display:none;z-index:9999}
-
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
   </style>
 
-  <!-- PDF 생성용 라이브러리 -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.31/dist/jspdf.plugin.autotable.min.js" crossorigin="anonymous"></script>
 </head>
+
 <body>
   <div class="wrap">
     <div class="top">
@@ -104,31 +106,29 @@
               <div>
                 <label for="quoteNo">견적번호</label>
                 <input id="quoteNo" class="mono" placeholder="자동 생성" />
-                <div class="hint" style="min-height:auto">자동 생성됩니다(필요 시 수정 가능).</div>
               </div>
               <div>
                 <label for="quoteDate">견적일</label>
                 <input id="quoteDate" type="date" />
-                <div class="hint">견적서 유효기간은 20일입니다.</div>
               </div>
               <div>
                 <label for="validUntil">유효기간</label>
                 <input id="validUntil" type="date" readonly />
-                <div class="hint">유효기간 내 02-6405-4446으로 문의</div>
               </div>
             </div>
+            <div class="hint">견적서 유효기간은 20일입니다. (유효기간 내 02-6405-4446으로 문의)</div>
 
-            <div class="hd" style="margin:6px -16px -2px;border-top:1px solid var(--line)">
-              <b>제품 선택 및 라이선스 수량</b><span class="muted">수량 입력 시 자동 계산</span>
-            </div>
+            <div class="hd" style="margin:6px -16px -2px;border-top:1px solid var(--line)"><b>제품 선택</b><span class="muted">수량 입력 시 자동 계산</span></div>
 
+            <!-- Recruiter -->
             <div class="row">
               <div>
-                <label>Recruiter (인재검색) — $11,350 / 라이선스</label>
-                <div class="muted">13억명의 가입자를 언제든 검색하고, 인맥과 관련없이 메시지를 보낼 수 있습니다.</div>
+                <label>🔎 Recruiter (인재검색)</label>
+                <div class="desc">• 13억명 인재 검색
+• 인맥 무관 메시지</div>
               </div>
               <div>
-                <label for="qtyRecruiter">수량(라이선스)</label>
+                <label for="qtyRecruiter">수량</label>
                 <select id="qtyRecruiter">
                   <option value="0" selected>선택 안 함</option>
                   <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
@@ -141,13 +141,15 @@
               </div>
             </div>
 
+            <!-- Job Slot -->
             <div class="row">
               <div>
-                <label>Job Slot (채용공고) — $2,010 / 슬롯</label>
-                <div class="muted">직무별 채용공고를 오픈하고, 후보자를 지속적으로 모집합니다.</div>
+                <label>📌 Job Slot (채용공고)</label>
+                <div class="desc">• 직무별 공고 운영
+• 상시 후보자 모집</div>
               </div>
               <div>
-                <label for="qtyJob">수량(슬롯)</label>
+                <label for="qtyJob">수량</label>
                 <select id="qtyJob">
                   <option value="0" selected>선택 안 함</option>
                   <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
@@ -160,49 +162,55 @@
               </div>
             </div>
 
-            <div class="row" style="grid-template-columns:1fr 160px 160px">
-              <div>
-                <label>AI Hiring Assistant (Recruiter 옵션) — Tier 선택</label>
-                <div class="muted">JD 업로드 → 원하는 수 만큼 후보자 AI 평가 및 추천(채용담당자 검토시간 축소)</div>
-                <div class="hint">AI Hiring Assistant는 Recruiter 솔루션 + 옵션상품입니다.</div>
+            <!-- AI Hiring Assistant -->
+            <div class="aiBox">
+              <div class="row" style="grid-template-columns:1fr 160px 160px">
+                <div>
+                  <label>🤖 AI Hiring Assistant (옵션)</label>
+                  <div class="desc">• JD 업로드 → AI 평가/추천
+• 검토 시간 단축</div>
+                  <div class="hint">AI Hiring Assistant는 Recruiter 솔루션 + 옵션상품입니다.</div>
+                </div>
+                <div>
+                  <label for="aiTier">Tier</label>
+                  <select id="aiTier">
+                    <option value="none" selected>선택 안 함</option>
+                    <option value="t1">Tier 1</option>
+                    <option value="t2">Tier 2</option>
+                    <option value="t3">Tier 3</option>
+                  </select>
+                </div>
+                <div>
+                  <label>금액</label>
+                  <input id="amtAI" readonly />
+                </div>
               </div>
-              <div>
-                <label for="aiTier">Tier</label>
-                <select id="aiTier">
-                  <option value="none" selected>선택 안 함</option>
-                  <option value="t1">Tier 1 — $3,170 (후보자 200명)</option>
-                  <option value="t2">Tier 2 — $6,910 (후보자 800명)</option>
-                  <option value="t3">Tier 3 — $10,365 (후보자 1,500명)</option>
-                </select>
-              </div>
-              <div>
-                <label>금액</label>
-                <input id="amtAI" readonly />
+
+              <div class="row" style="grid-template-columns:1fr 160px 160px">
+                <div class="desc">※ 13억명 후보자 중 Tier별 AI평가: Tier1=200, Tier2=800, Tier3=1500</div>
+                <div>
+                  <label>13억명 후보자 중 AI평가</label>
+                  <input id="aiCapacity" readonly />
+                </div>
+                <div>
+                  <label>지원자 중 AI평가</label>
+                  <input id="aiApplicant" readonly />
+                </div>
               </div>
             </div>
 
-            <div class="row" style="grid-template-columns:1fr 160px 160px">
-              <div class="muted" style="margin-top:-6px">※ AI Assistant 금액은 선택한 Tier 단가로 계산됩니다(수량 없음).</div>
-              <div>
-                <label>AI 평가/추천 가능 수</label>
-                <input id="aiCapacity" readonly />
-              </div>
-              <div>
-                <label>참고</label>
-                <input value="Recruiter 옵션" readonly />
-              </div>
-            </div>
-
+            <!-- Life Page -->
             <div class="row">
               <div>
-                <label>Life Page (기업브랜딩/광고) — 문의 필수</label>
-                <div class="muted">기업 규모/목표/구성(탭 수 등)에 따라 가격이 상이합니다. 정확한 견적은 문의가 필요합니다.</div>
+                <label>📣 Life Page (기업 브랜딩)</label>
+                <div class="desc">• 타겟 홍보/팔로워 확대
+• 금액은 기업 규모에 따라 상이</div>
               </div>
               <div>
                 <label for="lifeInclude">포함 여부</label>
                 <select id="lifeInclude">
                   <option value="no" selected>미포함</option>
-                  <option value="yes">포함(금액: 문의)</option>
+                  <option value="yes">포함(문의)</option>
                 </select>
               </div>
               <div>
@@ -211,13 +219,15 @@
               </div>
             </div>
 
+            <!-- LTI -->
             <div class="row">
               <div>
-                <label>LTI (경쟁사 분석) — $12,500 / 라이선스</label>
-                <div class="muted">경쟁사의 인력현황 및 역량 분석을 통해 지금 우리에게 필요한 것이 무엇인지 전략을 세울 수 있습니다.</div>
+                <label>📊 LTI (경쟁사 분석)</label>
+                <div class="desc">• 경쟁사 인력/역량 분석
+• 채용 전략 수립</div>
               </div>
               <div>
-                <label for="qtyLTI">수량(라이선스)</label>
+                <label for="qtyLTI">수량</label>
                 <select id="qtyLTI">
                   <option value="0" selected>선택 안 함</option>
                   <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
@@ -275,18 +285,16 @@
             </tfoot>
           </table>
 
-          <div id="minNotice" style="margin-top:10px;font-size:12px;font-weight:700;color:#f87171;display:none;line-height:1.5">
+          <div id="minNotice" style="margin-top:10px;font-size:12px;font-weight:800;color:#f87171;display:none;line-height:1.5">
             기업용 솔루션은 최소 합계금액이 $10,000 부터 계약이 가능합니다.<br/>
             구체적인 문의는 Linkedin Korea Partner로 연락주세요.
           </div>
 
-          <div class="foot" style="margin-top:12px">
-            <div class="callout" style="margin-top:0;border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.10);color:#d1fae5">
-              <b>기업용 솔루션 문의</b><br/>
-              LinkedIn Korea Partner<br/>
-              02-6405-4446<br/>
-              help@hrpoint.co.kr
-            </div>
+          <div class="callout" style="border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.10);color:#d1fae5;margin-top:12px">
+            <b>기업용 솔루션 문의</b><br/>
+            Linkedin Korea Partner<br/>
+            02-6405-4446<br/>
+            help@hrpoint.co.kr
           </div>
         </div>
       </div>
@@ -307,22 +315,10 @@
   </div>
 
   <script>
-    // ====== 설정: 새 WebApp URL ======
-    const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyKXViLvpFodgzG4ZhAQSChzlVNqsMeY1ED9iNBL252GdeMrgOd7d-cdRTvrP30c8cf/exec";
+    // ====== 새 WebApp URL ======
+    const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyGUnl2eAXU3Vh9_Y9ZPtdXfVZu_z6OwKczEMzU1EOQibLoroweRa3-X9ksVIPXMhjmSw/exec";
 
-    // 안전 DOM 헬퍼
-    const $ = (id) => document.getElementById(id);
-
-    const toast = (msg='완료') => {
-      const t = $('toast');
-      if (!t) return;
-      t.textContent = msg;
-      t.style.display = 'block';
-      clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(()=>{t.style.display='none';}, 1600);
-    };
-
-    // ===== PDF 한글 폰트 로딩 (jsPDF 기본 폰트는 한글을 지원하지 않아 깨집니다) =====
+    // ====== PDF 한글 폰트 로딩(깨짐 방지) ======
     const KOREAN_FONT_URL = "https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-kr/files/noto-sans-kr-korean-400-normal.ttf";
     let __koreanFontB64 = null;
     let __koreanFontLoading = null;
@@ -339,36 +335,43 @@
 
     async function ensureKoreanFont(doc) {
       try { doc.setFont("NotoSansKR"); return; } catch (e) {}
-
       if (__koreanFontB64) {
         doc.addFileToVFS("NotoSansKR-Regular.ttf", __koreanFontB64);
         doc.addFont("NotoSansKR-Regular.ttf", "NotoSansKR", "normal");
         doc.setFont("NotoSansKR");
         return;
       }
-
       if (!__koreanFontLoading) {
         __koreanFontLoading = fetch(KOREAN_FONT_URL)
           .then(r => { if (!r.ok) throw new Error("Font download failed"); return r.arrayBuffer(); })
           .then(buf => (__koreanFontB64 = __arrayBufferToBase64(buf)));
       }
-
       const b64 = await __koreanFontLoading;
       doc.addFileToVFS("NotoSansKR-Regular.ttf", b64);
       doc.addFont("NotoSansKR-Regular.ttf", "NotoSansKR", "normal");
       doc.setFont("NotoSansKR");
     }
 
-    // ===== 견적/계산 =====
+    const $ = (id) => document.getElementById(id);
+
+    const toast = (msg='완료') => {
+      const t = $('toast');
+      if (!t) return;
+      t.textContent = msg;
+      t.style.display = 'block';
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(()=>{t.style.display='none';}, 1600);
+    };
+
     const PRICES = {
       recruiter: 11350,
       job: 2010,
       lti: 12500,
       ai: {
-        none: { price: 0, cap: 0, label: '선택 안 함' },
-        t1: { price: 3170, cap: 200, label: 'Tier 1 (200명)' },
-        t2: { price: 6910, cap: 800, label: 'Tier 2 (800명)' },
-        t3: { price: 10365, cap: 1500, label: 'Tier 3 (1,500명)' },
+        none: { price: 0, cap: 0, app: 0 },
+        t1: { price: 3170, cap: 200, app: 3500 },
+        t2: { price: 6910, cap: 800, app: 9000 },
+        t3: { price: 10365, cap: 1500, app: 25000 },
       }
     };
 
@@ -376,7 +379,7 @@
     const money = (n) => `$${nfmt(n)}`;
     const toNum = (v) => {
       if (v == null) return 0;
-      const s = String(v).replace(/[,\s]/g,'').trim();
+      const s = String(v).replace(/[\s,]/g,'').trim();
       if (!s) return 0;
       const x = Number(s);
       return isFinite(x) ? x : 0;
@@ -388,7 +391,7 @@
       const m = String(d.getMonth()+1).padStart(2,'0');
       const day = String(d.getDate()).padStart(2,'0');
       const rnd = Math.random().toString(16).slice(2,6).toUpperCase();
-      return `LK-${y}${m}${day}-${rnd}`;
+      return `${y}${m}${day}-LK-${rnd}`;
     };
 
     const addDaysISO = (isoDate, days) => {
@@ -398,25 +401,24 @@
       return d.toISOString().slice(0,10);
     };
 
-    function setDefaultQuoteFields() {
+    function setDefaultQuoteFields(){
       const today = new Date().toISOString().slice(0,10);
       if ($('quoteDate') && !$('quoteDate').value) $('quoteDate').value = today;
-      if ($('validUntil')) $('validUntil').value = addDaysISO($('quoteDate')?.value || today, 20);
+      if ($('validUntil')) $('validUntil').value = addDaysISO($('quoteDate').value, 20);
       if ($('quoteNo') && !$('quoteNo').value) $('quoteNo').value = genQuoteNo();
     }
 
-    const buildRows = (state) => {
+    function buildRows(state){
       const rows = [];
       if (state.qtyRecruiter > 0) rows.push({ name:'Recruiter (인재검색)', unit:PRICES.recruiter, qty:state.qtyRecruiter, amount:state.amtRecruiter });
       if (state.qtyJob > 0) rows.push({ name:'Job Slot (채용공고)', unit:PRICES.job, qty:state.qtyJob, amount:state.amtJob });
-      if (state.aiTier !== 'none') rows.push({ name:`AI Hiring Assistant (${PRICES.ai[state.aiTier].label})`, unit:PRICES.ai[state.aiTier].price, qty:1, amount:state.amtAI });
-      if (state.lifeInclude === 'yes') rows.push({ name:'Life Page (기업브랜딩/광고) — 문의 필수', unit:null, qty:null, amount:null });
+      if (state.aiTier !== 'none') rows.push({ name:`AI Hiring Assistant (Tier ${state.aiTier.slice(1)})`, unit:PRICES.ai[state.aiTier].price, qty:1, amount:state.amtAI });
+      if (state.lifeInclude === 'yes') rows.push({ name:'Life Page (기업 브랜딩) — 문의', unit:null, qty:null, amount:null });
       if (state.qtyLTI > 0) rows.push({ name:'LTI (경쟁사 분석)', unit:PRICES.lti, qty:state.qtyLTI, amount:state.amtLTI });
       return rows;
-    };
+    }
 
-    const recalc = () => {
-      // 견적일 변경 시 유효기간 자동 변경
+    function recalc(){
       if ($('quoteDate')?.value && $('validUntil')) $('validUntil').value = addDaysISO($('quoteDate').value, 20);
 
       const aiTier = $('aiTier')?.value || 'none';
@@ -427,160 +429,133 @@
 
       const amtRecruiter = qtyRecruiter * PRICES.recruiter;
       const amtJob = qtyJob * PRICES.job;
-      const amtAI = (PRICES.ai[aiTier]?.price || 0);
+      const amtAI = PRICES.ai[aiTier]?.price || 0;
       const amtLTI = qtyLTI * PRICES.lti;
-      const total = amtRecruiter + amtAI + amtJob + amtLTI;
 
-      if ($('amtRecruiter')) $('amtRecruiter').value = money(amtRecruiter);
-      if ($('amtAI')) $('amtAI').value = money(amtAI);
-      if ($('amtJob')) $('amtJob').value = money(amtJob);
-      if ($('amtLTI')) $('amtLTI').value = money(amtLTI);
-      if ($('amtLife')) $('amtLife').value = lifeInclude === 'yes' ? '문의 필수' : '-';
+      const total = amtRecruiter + amtJob + amtAI + amtLTI;
 
-      const cap = PRICES.ai[aiTier]?.cap || 0;
-      if ($('aiCapacity')) $('aiCapacity').value = aiTier === 'none' ? '후보자 직접 검증' : `후보자 ${nfmt(cap)}명 AI 평가/추천`;
+      $('amtRecruiter').value = money(amtRecruiter);
+      $('amtJob').value = money(amtJob);
+      $('amtAI').value = money(amtAI);
+      $('amtLTI').value = money(amtLTI);
+      $('amtLife').value = (lifeInclude === 'yes') ? '문의' : '-';
 
-      if ($('total')) $('total').textContent = money(total);
-      if ($('total2')) $('total2').textContent = money(total);
+      // AI 표시(요청 반영)
+      if (aiTier === 'none') {
+        $('aiCapacity').value = '선택 안 함';
+        $('aiApplicant').value = '선택 안 함';
+      } else {
+        $('aiCapacity').value = `${nfmt(PRICES.ai[aiTier].cap)}명`;
+        $('aiApplicant').value = `${nfmt(PRICES.ai[aiTier].app)}명`;
+      }
+
+      $('total').textContent = money(total);
+      $('total2').textContent = money(total);
 
       const rows = buildRows({ aiTier, qtyRecruiter, qtyJob, qtyLTI, lifeInclude, amtRecruiter, amtAI, amtJob, amtLTI, total });
+      $('items').textContent = rows.length ? `${rows.length}개 항목` : '-';
 
-      // 최소 계약 금액 안내
       const minNotice = document.getElementById('minNotice');
       if (minNotice) minNotice.style.display = (total > 0 && total < 10000) ? 'block' : 'none';
 
-      if ($('items')) $('items').textContent = rows.length ? `${rows.length}개 항목` : '-';
-
       const tb = $('tbody');
-      if (tb) {
-        tb.innerHTML = rows.length ? rows.map(r => {
-          const unit = (r.unit == null) ? '문의' : money(r.unit);
-          const qty = (r.qty == null) ? '-' : nfmt(r.qty);
-          const amt = (r.amount == null) ? '문의' : money(r.amount);
-          return `<tr><td>${r.name}</td><td class="right">${unit}</td><td class="right">${qty}</td><td class="right">${amt}</td></tr>`;
-        }).join('') : `<tr><td colspan="4" class="muted">선택된 항목이 없습니다. 수량/티어를 선택해 주세요.</td></tr>`;
-      }
+      tb.innerHTML = rows.length ? rows.map(r => {
+        const unit = (r.unit == null) ? '문의' : money(r.unit);
+        const qty = (r.qty == null) ? '-' : nfmt(r.qty);
+        const amt = (r.amount == null) ? '문의' : money(r.amount);
+        return `<tr><td>${r.name}</td><td class="right">${unit}</td><td class="right">${qty}</td><td class="right">${amt}</td></tr>`;
+      }).join('') : `<tr><td colspan="4" class="muted">선택된 항목이 없습니다.</td></tr>`;
 
       return { total, rows, aiTier };
-    };
-
-    // ====== 시트 저장: fetch POST (웨일/모바일 대응) ======
-    async function saveToSheet(payload) {
-      try {
-        const url = GAS_WEBAPP_URL + "?_ts=" + Date.now();
-
-        // ✅ 웨일/모바일에서 /u/x 리다이렉트 최소화를 위해 쿠키 미전송
-        // ✅ no-cors: 브라우저가 응답을 읽지 않아도 전송 자체가 목적(고객 환경에서 성공률 ↑)
-        await fetch(url, {
-          method: "POST",
-          mode: "no-cors",
-          credentials: "omit",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-          },
-          body: new URLSearchParams(payload).toString(),
-          cache: "no-store",
-          redirect: "follow",
-        });
-
-        // no-cors는 성공/실패를 확정할 수 없으니 “전송 시도” 토스트만
-        toast("시트 저장 요청 완료");
-      } catch (e) {
-        // 조용히 실패 처리(고객 UX 보호). 필요하면 toast로 알림 가능.
-        toast("시트 저장 실패(네트워크)");
-      }
     }
 
-    function buildSheetPayload(total, rows, aiTier) {
-      const quoteNo = $('quoteNo')?.value || '';
-      const companyName = $('company')?.value || '';
-      const contactName = $('contact')?.value || '';
-      const contactEmail = $('email')?.value || '';
+    async function saveToSheet(payload){
+      try {
+        const url = GAS_WEBAPP_URL + "?_ts=" + Date.now();
+        await fetch(url, {
+          method: 'POST',
+          mode: 'no-cors',
+          credentials: 'omit',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+          body: new URLSearchParams(payload).toString(),
+          cache: 'no-store',
+          redirect: 'follow'
+        });
+      } catch(e) {}
+    }
 
+    function buildSheetPayload(total, rows, aiTier){
       const selectedSummary = rows
-        .filter(r => r.unit != null) // 문의 항목 제외
-        .map(r => {
-          if (r.name.startsWith("AI Hiring Assistant")) return `AI:${aiTier}`;
-          return `${r.name} x${r.qty}`;
-        })
-        .join(" + ");
-
-      const selectedCount = rows.length;
+        .map(r => (r.unit == null) ? `${r.name}` : `${r.name} x${r.qty}`)
+        .join(' + ');
 
       return {
         savedAt: new Date().toISOString(),
-        quoteNo,
-        companyName,
-        contactName,
-        contactEmail,
-        currency: "USD",
+        quoteNo: $('quoteNo')?.value || '',
+        companyName: $('company')?.value || '',
+        contactName: $('contact')?.value || '',
+        contactEmail: $('email')?.value || '',
+        currency: 'USD',
         totalUSD: String(total),
-        selectedCount: String(selectedCount),
-        selectedSummary: selectedSummary || "-",
-        aiTier: aiTier || "none",
+        selectedCount: String(rows.length),
+        selectedSummary: selectedSummary || '-',
+        aiTier: aiTier || 'none',
         pageUrl: location.href,
         userAgent: navigator.userAgent,
       };
     }
 
-    // ===== PDF 생성 (한글 정상 출력) =====
-    const makePdf = async () => {
+    async function makePdf(){
       setDefaultQuoteFields();
-
       const { total, rows, aiTier } = recalc();
+      if (!rows.length) { toast('선택된 항목이 없습니다.'); return; }
 
-      if (!rows.length) {
-        toast('수량/티어를 선택해 주세요.');
-        return;
-      }
+      const company = $('company').value || '';
+      const contact = $('contact').value || '';
+      const email = $('email').value || '';
+      const quoteNo = $('quoteNo').value || genQuoteNo();
+      const quoteDate = $('quoteDate').value || new Date().toISOString().slice(0,10);
+      const validUntil = $('validUntil').value || addDaysISO(quoteDate, 20);
 
-      // PDF용 값
-      const company = $('company')?.value || '';
-      const contact = $('contact')?.value || '';
-      const email = $('email')?.value || '';
-      const quoteNo = $('quoteNo')?.value || genQuoteNo();
-      const quoteDate = $('quoteDate')?.value || new Date().toISOString().slice(0,10);
-      const validUntil = $('validUntil')?.value || addDaysISO(quoteDate, 20);
-
-      // 화면 값 확정
-      if ($('quoteNo')) $('quoteNo').value = quoteNo;
-      if ($('quoteDate')) $('quoteDate').value = quoteDate;
-      if ($('validUntil')) $('validUntil').value = validUntil;
+      $('quoteNo').value = quoteNo;
+      $('quoteDate').value = quoteDate;
+      $('validUntil').value = validUntil;
 
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const doc = new jsPDF({ unit:'pt', format:'a4' });
 
       await ensureKoreanFont(doc);
       doc.setFont('NotoSansKR');
 
-      const marginX = 40;
-      let y = 44;
+      const marginX = 44;
+      let y = 60;
 
-      doc.setFontSize(18);
-      doc.text('Quotation (LinkedIn Solutions)', marginX, y);
-      y += 20;
+      // 상단 제목(요청)
+      doc.setFontSize(22);
+      doc.text('Linkedin Solution 견적서', marginX, y);
+      y += 22;
 
       doc.setFontSize(10);
-      doc.text(`Quote No: ${quoteNo}`, marginX, y);
-      doc.text(`Date: ${quoteDate}`, 360, y);
+      doc.text(`견적번호: ${quoteNo}`, marginX, y);
+      doc.text(`견적일: ${quoteDate}`, 360, y);
       y += 14;
 
-      doc.text(`Valid Until: ${validUntil} (20 days)`, marginX, y);
+      doc.text(`유효기간: ${validUntil} (20일)`, marginX, y);
       y += 14;
 
       doc.text('VAT: None', marginX, y);
       y += 18;
 
-      doc.text(`Company: ${company}`, marginX, y);
+      doc.text(`회사명: ${company}`, marginX, y);
       y += 14;
-      doc.text(`Contact: ${contact}`, marginX, y);
-      doc.text(`Email: ${email}`, 360, y);
+      doc.text(`담당자: ${contact}`, marginX, y);
+      doc.text(`이메일: ${email}`, 360, y);
       y += 18;
 
       const body = rows.map(r => {
-        const unit = (r.unit == null) ? 'TBD (Inquiry)' : money(r.unit);
+        const unit = (r.unit == null) ? '문의' : money(r.unit);
         const qty = (r.qty == null) ? '-' : String(r.qty);
-        const amt = (r.amount == null) ? 'TBD (Inquiry)' : money(r.amount);
+        const amt = (r.amount == null) ? '문의' : money(r.amount);
         return [r.name, unit, qty, amt];
       });
 
@@ -598,116 +573,82 @@
       doc.setFontSize(12);
       doc.text(`Total (USD): ${money(total)}`, 360, endY);
 
-      let y2 = endY + 18;
-      doc.setFontSize(9);
-
-      const lines = [
-        '• 유효기간 내 02-6405-4446으로 문의',
-        '• Life Page는 기업 규모에 따라 금액이 상이. 문의필수',
-        '• 기업용 솔루션 문의: LinkedIn Korea Partner (02-6405-4446 / help@hrpoint.co.kr)'
-      ];
-      doc.text(lines.join('\n'), marginX, y2);
+      // 하단 중앙 Partner 문구(요청)
+      const pageH = doc.internal.pageSize.getHeight();
+      doc.setFontSize(10);
+      doc.text('Linkedin Korea Partner', doc.internal.pageSize.getWidth()/2, pageH - 36, { align: 'center' });
 
       doc.save(`LinkedIn_Quotation_${quoteNo}.pdf`);
-    };
+    }
 
-    // ===== 링크 공유 / 초기화 =====
-    const getStateForLink = () => ({
-      company: $('company')?.value || '',
-      contact: $('contact')?.value || '',
-      email: $('email')?.value || '',
-      quoteNo: $('quoteNo')?.value || '',
-      quoteDate: $('quoteDate')?.value || '',
-      qtyRecruiter: $('qtyRecruiter')?.value || '0',
-      aiTier: $('aiTier')?.value || 'none',
-      qtyJob: $('qtyJob')?.value || '0',
-      lifeInclude: $('lifeInclude')?.value || 'no',
-      qtyLTI: $('qtyLTI')?.value || '0',
-    });
+    async function onDownload(){
+      setDefaultQuoteFields();
+      const { total, rows, aiTier } = recalc();
+      await saveToSheet(buildSheetPayload(total, rows, aiTier));
+      await makePdf();
+    }
 
-    const applyStateFromLink = () => {
+    async function copyLink(){
+      const p = new URLSearchParams({
+        company: $('company').value || '',
+        contact: $('contact').value || '',
+        email: $('email').value || '',
+        quoteNo: $('quoteNo').value || '',
+        quoteDate: $('quoteDate').value || '',
+        qtyRecruiter: $('qtyRecruiter').value || '0',
+        qtyJob: $('qtyJob').value || '0',
+        aiTier: $('aiTier').value || 'none',
+        lifeInclude: $('lifeInclude').value || 'no',
+        qtyLTI: $('qtyLTI').value || '0'
+      });
+      const url = `${location.origin}${location.pathname}?${p.toString()}`;
+      try { await navigator.clipboard.writeText(url); toast('입력값 링크가 복사되었습니다.'); }
+      catch(e){ toast('복사 실패'); }
+    }
+
+    function applyStateFromLink(){
       const p = new URLSearchParams(location.search);
       const set = (id, key) => { if (p.has(key) && $(id)) $(id).value = p.get(key); };
-
       set('company','company');
       set('contact','contact');
       set('email','email');
       set('quoteNo','quoteNo');
       set('quoteDate','quoteDate');
       set('qtyRecruiter','qtyRecruiter');
-      if (p.has('aiTier') && $('aiTier')) $('aiTier').value = p.get('aiTier');
       set('qtyJob','qtyJob');
-      if (p.has('lifeInclude') && $('lifeInclude')) $('lifeInclude').value = p.get('lifeInclude');
+      set('aiTier','aiTier');
+      set('lifeInclude','lifeInclude');
       set('qtyLTI','qtyLTI');
+    }
 
-      setDefaultQuoteFields();
-    };
-
-    const copyLink = async () => {
-      const s = getStateForLink();
-      const p = new URLSearchParams();
-      Object.entries(s).forEach(([k,v]) => { if (String(v).trim() !== '') p.set(k, v); });
-      const url = `${location.origin}${location.pathname}?${p.toString()}`;
-
-      try{
-        await navigator.clipboard.writeText(url);
-        toast('입력값 링크가 복사되었습니다.');
-      }catch(e){
-        const ta = document.createElement('textarea');
-        ta.value = url;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        toast('입력값 링크가 복사되었습니다.');
-      }
-    };
-
-    const resetAll = () => {
-      if ($('company')) $('company').value='';
-      if ($('contact')) $('contact').value='';
-      if ($('email')) $('email').value='';
-      if ($('quoteNo')) $('quoteNo').value='';
-      if ($('quoteDate')) $('quoteDate').value='';
-      if ($('qtyRecruiter')) $('qtyRecruiter').value='0';
-      if ($('aiTier')) $('aiTier').value='none';
-      if ($('qtyJob')) $('qtyJob').value='0';
-      if ($('lifeInclude')) $('lifeInclude').value='no';
-      if ($('qtyLTI')) $('qtyLTI').value='0';
+    function resetAll(){
+      $('company').value='';
+      $('contact').value='';
+      $('email').value='';
+      $('quoteNo').value='';
+      $('quoteDate').value='';
+      $('qtyRecruiter').value='0';
+      $('qtyJob').value='0';
+      $('aiTier').value='none';
+      $('lifeInclude').value='no';
+      $('qtyLTI').value='0';
       history.replaceState({}, '', location.pathname);
       setDefaultQuoteFields();
       recalc();
       toast('초기화 완료');
-    };
+    }
 
-    // ===== 이벤트 =====
-    document.getElementById('btnPdf')?.addEventListener('click', async (e)=> {
-      e.preventDefault();
-      setDefaultQuoteFields();
+    document.getElementById('btnPdf')?.addEventListener('click', async (e)=>{ e.preventDefault(); await onDownload(); });
+    document.getElementById('btnCopyLink')?.addEventListener('click', async (e)=>{ e.preventDefault(); await copyLink(); });
+    document.getElementById('btnReset')?.addEventListener('click', (e)=>{ e.preventDefault(); resetAll(); });
 
-      // PDF 생성 전, 시트 저장 먼저(전송 시도)
-      const { total, rows, aiTier } = recalc();
-      const payload = buildSheetPayload(total, rows, aiTier);
-      await saveToSheet(payload);
-
-      // PDF 생성
-      await makePdf();
-    });
-
-    document.getElementById('btnCopyLink')?.addEventListener('click', (e)=>{e.preventDefault(); copyLink();});
-    document.getElementById('btnReset')?.addEventListener('click', (e)=>{e.preventDefault(); resetAll();});
-
-    [
-      'company','contact','email','quoteNo','quoteDate',
-      'qtyRecruiter','aiTier','qtyJob','lifeInclude','qtyLTI'
-    ].forEach(id=>{
+    ['company','contact','email','quoteNo','quoteDate','qtyRecruiter','qtyJob','aiTier','lifeInclude','qtyLTI'].forEach(id=>{
       const el = document.getElementById(id);
       if (!el) return;
       el.addEventListener('input', ()=>{ setDefaultQuoteFields(); recalc(); });
       el.addEventListener('change', ()=>{ setDefaultQuoteFields(); recalc(); });
     });
 
-    // 초기화
     applyStateFromLink();
     setDefaultQuoteFields();
     recalc();
